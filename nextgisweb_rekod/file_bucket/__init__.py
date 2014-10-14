@@ -12,14 +12,19 @@ class FileBucketComponent(Component):
     identity = 'file_bucket'
     metadata = Base.metadata
 
+    def initialize(self):
+        self.path = self.settings.get('path') or self.env.core.gtsdir(self)
+
+    def initialize_db(self):
+        if 'path' not in self.settings:
+            self.env.core.mksdir(self)
+
     def setup_pyramid(self, config):
-        from . import view # NOQA
+        from . import view  # NOQA
 
     def dirname(self, stuuid, makedirs=False):
-        basepath = self.settings['path']
-
         levels = (stuuid[0:2], stuuid[2:4], stuuid)
-        path = os.path.join(basepath, *levels)
+        path = os.path.join(self.path, *levels)
 
         if makedirs and not os.path.isdir(path):
             os.makedirs(path)
