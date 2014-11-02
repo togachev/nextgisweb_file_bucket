@@ -5,7 +5,7 @@ import os.path
 from pyramid.response import FileResponse
 from pyramid.httpexceptions import HTTPNotFound
 
-from nextgisweb.resource import Widget, resource_factory, DataScope
+from nextgisweb.resource import Resource, Widget, resource_factory, DataScope
 from nextgisweb.env import env
 from .model import FileBucket
 
@@ -37,3 +37,8 @@ def setup_pyramid(comp, config):
         '/resource/{id}/file/{name}',
         factory=resource_factory
     ).add_view(file_download, context=FileBucket)
+
+    Resource.__psection__.register(
+        key='file_bucket', priority=20, title="Набор файлов",
+        is_applicable=lambda obj: isinstance(obj, FileBucket),
+        template='nextgisweb_rekod:file_bucket/template/section.mako')
