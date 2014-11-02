@@ -21,6 +21,7 @@ class FileBucketComponent(Component):
 
     def setup_pyramid(self, config):
         from . import view  # NOQA
+        view.setup_pyramid(self, config)
 
     def dirname(self, stuuid, makedirs=False):
         levels = (stuuid[0:2], stuuid[2:4], stuuid)
