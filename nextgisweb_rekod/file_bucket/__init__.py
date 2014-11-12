@@ -20,15 +20,23 @@ class FileBucketFileBackup(BackupBase):
         stuuid, name = self.key.split(':', 1)
         dirname = self.comp.dirname(stuuid)
         fname = os.path.join(dirname, name)
-        with open(fname, 'rb') as fd:
-            copyfileobj(fd, self.binfd)
+        if os.path.isfile(fname):
+            with open(fname, 'rb') as fd:
+                copyfileobj(fd, self.binfd)
+
+        # TODO: Разобраться почему файл может не существовать
 
     def restore(self):
         stuuid, name = self.key.split(':', 1)
         dirname = self.comp.dirname(stuuid, makedirs=True)
         fname = os.path.join(dirname, name)
-        with open(fname, 'wb') as fd:
-            copyfileobj(self.binfd, fd)
+
+        # Файл уже может существовать, например в случае если бекап поверх
+        # разворачивается, в ситуации когда файлы не изменяются это ок.
+
+        if not os.path.isfile(fname):
+            with open(fname, 'wb') as fd:
+                copyfileobj(self.binfd, fd)
 
 
 @Component.registry.register
