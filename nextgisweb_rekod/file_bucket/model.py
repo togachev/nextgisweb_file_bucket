@@ -14,7 +14,8 @@ from nextgisweb.resource import (
     DataStructureScope,
     DataScope,
     MetadataScope,
-    ValidationError)
+    ValidationError,
+    ResourceGroup)
 from nextgisweb.env import env
 
 
@@ -32,7 +33,7 @@ class FileBucket(Base, Resource):
 
     @classmethod
     def check_parent(self, parent):
-        return parent.cls == 'resource_group'
+        return isinstance(parent, ResourceGroup)
 
 
 class FileBucketFile(Base):
