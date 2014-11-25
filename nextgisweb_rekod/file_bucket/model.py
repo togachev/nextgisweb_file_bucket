@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import uuid
+import os
 import os.path
 from datetime import datetime
 from shutil import copyfile
@@ -39,7 +40,9 @@ class FileBucket(Base, Resource):
 class FileBucketFile(Base):
     __tablename__ = 'file_bucket_file'
 
-    file_bucket_id = db.Column(db.ForeignKey('file_bucket.id'), primary_key=True)
+    file_bucket_id = db.Column(
+        db.ForeignKey('file_bucket.id'),
+        primary_key=True)
 
     name = db.Column(db.Unicode(255), primary_key=True)
     size = db.Column(db.BigInteger, nullable=False)
@@ -47,7 +50,7 @@ class FileBucketFile(Base):
 
     file_bucket = db.relationship(
         FileBucket, foreign_keys=file_bucket_id,
-        backref=db.backref('files', cascade='all'))
+        backref=db.backref('files', cascade='all,delete-orphan'))
 
 
 class _files_attr(SP):
@@ -58,28 +61,60 @@ class _files_attr(SP):
             srlzr.obj.files)
 
     def setter(self, srlzr, value):
+        if srlzr.obj.stuuid is not None:
+            odir = env.file_bucket.dirname(srlzr.obj.stuuid, makedirs=True)
+        else:
+            odir = None
+
         srlzr.obj.stuuid = str(uuid.uuid4().hex)
         srlzr.obj.tstamp = datetime.utcnow()
 
         dirname = env.file_bucket.dirname(srlzr.obj.stuuid, makedirs=True)
 
-        for f in value:
-            filedata, filemeta = env.file_upload.get_filename(f['id'])
+        keep = list()
 
+        for f in value:
+            keep.append(f['name'])
             targetfile = os.path.abspath(os.path.join(dirname, f['name']))
+
             if not targetfile.startswith(dirname):
                 # Проверяем на вещи типа ".." в имени файла или "/" в начале,
                 # в общем в любом случае, если итоговый путь получился за
                 # приделами директории в которой ожидали, то выбрасываем
-                # ошибку валидации
-                raise ValidationError("Insecure filename")
+                # ошибку валидации.
 
-            copyfile(filedata, targetfile)
+                raise ValidationError("Insecure filename.")
 
-            fobj = FileBucketFile(
-                name=f['name'], size=f['size'],
-                mime=f['mime_type'])
-            srlzr.obj.files.append(fobj)
+            if 'id' in f:
+                # Файл был загружен через компонент file_upload, копируем его.
+                # TODO: В перспективе наверное лучше заменить на ссылки.
+
+                srcfile, _ = env.file_upload.get_filename(f['id'])
+                copyfile(srcfile, targetfile)
+
+                fobj = FileBucketFile(
+                    name=f['name'], mime=f['mime'],
+                    size=f['size'])
+
+                srlzr.obj.files.append(fobj)
+
+            else:
+                # Файл остался из предыдущей версии, его нужно скопировать,
+                # поскольку имя файла так же от клиента получается, его нужно
+                # тоже проверять на принадлежность исходной директории.
+
+                srcfile = os.path.abspath(os.path.join(odir, f['name']))
+                if not srcfile.startswith(odir):
+                    raise ValidationError("Insecure filename.")
+
+                # Копировать долго, а ссылка должны создаваться быстро,
+                # при том, что файл не изменяется это хороший вариант.
+
+                os.link(srcfile, targetfile)
+
+        for fobj in list(srlzr.obj.files):
+            if fobj.name not in keep:
+                srlzr.obj.files.remove(fobj)
 
 
 class _tsamp_attr(SP):
