@@ -7,9 +7,8 @@ define([
     "dojo/store/Memory",
     "dojo/store/Observable",
     "dijit/layout/LayoutContainer",
-    "dijit/_TemplatedMixin",
-    "dijit/_WidgetsInTemplateMixin",
     "dijit/form/Button",
+    "dijit/Toolbar",
     "dijit/ProgressBar",
     "dojox/form/Uploader",
     "dgrid/OnDemandGrid",
@@ -17,9 +16,7 @@ define([
     "dgrid/editor",
     "dgrid/extensions/DijitRegistry",    
     "ngw/route",
-    "ngw-resource/serialize",
-    // resource
-    "dojo/text!./template/Widget.html"
+    "ngw-resource/serialize"
 ], function (
     declare,
     lang,
@@ -29,9 +26,8 @@ define([
     Memory,
     Observable,
     LayoutContainer,
-    _TemplatedMixin,
-    _WidgetsInTemplateMixin,
     Button,
+    Toolbar,
     ProgressBar,
     Uploader,
     Grid,
@@ -39,8 +35,7 @@ define([
     editor,
     DijitRegistry,
     route,
-    serialize,
-    template
+    serialize
 ) {
     // Uploader AMD workaround
     Uploader = dojox.form.Uploader;    
@@ -70,8 +65,7 @@ define([
     });
 
 
-    return declare([LayoutContainer, serialize.Mixin, _TemplatedMixin, _WidgetsInTemplateMixin], {
-        templateString: template,
+    return declare([LayoutContainer, serialize.Mixin], {
         title: "Набор файлов",
         serializePrefix: "file_bucket",
 
@@ -81,6 +75,10 @@ define([
 
         buildRendering: function () {
             this.inherited(arguments);
+
+            this.toolbar = new Toolbar({
+                region: 'top'
+            }).placeAt(this);
 
             this.uploader = new Uploader({
                 label: "Загрузить файлы",
