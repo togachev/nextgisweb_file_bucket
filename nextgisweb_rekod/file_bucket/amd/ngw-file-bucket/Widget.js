@@ -56,7 +56,7 @@ define([
             },
 
             {
-                field: "mime",
+                field: "mime_type",
                 label: "Тип MIME",
                 sortable: true
             },
@@ -93,7 +93,6 @@ define([
 
             this.uploader.on("complete", lang.hitch(this, function (data) {
                 array.forEach(data.upload_meta, function (f) {
-                    f.mime = f.mime_type; f.mime_type = undefined;
                     this.store.put(f);
                 }, this);
 
@@ -134,13 +133,8 @@ define([
         },
 
         deserializeInMixin: function (data) {
-            var files = data.file_bucket.files,
-                store = this.store;
-
-            for (var key in files) {
-                var value = files[key];
-                store.add(value);
-            }
+            var files = data.file_bucket.files;
+            for (var key in files) { this.store.add(files[key]) }
         },       
 
         serializeInMixin: function (data) {

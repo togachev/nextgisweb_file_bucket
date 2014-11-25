@@ -15,7 +15,7 @@
                 ${fobj.name}
                 </a>
             </td>
-            <td>${fobj.mime}</td>
+            <td>${fobj.mime_type}</td>
             <td>${fobj.size / 1024}</td>
         </tr>
     %endfor

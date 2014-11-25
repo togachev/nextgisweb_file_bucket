@@ -45,8 +45,8 @@ class FileBucketFile(Base):
         primary_key=True)
 
     name = db.Column(db.Unicode(255), primary_key=True)
+    mime_type = db.Column(db.Unicode, nullable=False)
     size = db.Column(db.BigInteger, nullable=False)
-    mime = db.Column(db.Unicode, nullable=False)
 
     file_bucket = db.relationship(
         FileBucket, foreign_keys=file_bucket_id,
@@ -57,7 +57,7 @@ class _files_attr(SP):
 
     def getter(self, srlzr):
         return map(
-            lambda f: dict(name=f.name, size=f.size, mime=f.mime),
+            lambda f: dict(name=f.name, size=f.size, mime_type=f.mime_type),
             srlzr.obj.files)
 
     def setter(self, srlzr, value):
@@ -93,8 +93,8 @@ class _files_attr(SP):
                 copyfile(srcfile, targetfile)
 
                 fobj = FileBucketFile(
-                    name=f['name'], mime=f['mime'],
-                    size=f['size'])
+                    name=f['name'], size=f['size'],
+                    mime_type=f['mime_type'])
 
                 srlzr.obj.files.append(fobj)
 
