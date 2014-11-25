@@ -16,7 +16,10 @@ define([
     "dgrid/editor",
     "dgrid/extensions/DijitRegistry",    
     "ngw/route",
-    "ngw-resource/serialize"
+    "ngw-resource/serialize",
+    // resource
+    "xstyle/css!./resource/Widget.css",
+    "ngw/dgrid/css"    
 ], function (
     declare,
     lang,
@@ -40,6 +43,17 @@ define([
     // Uploader AMD workaround
     Uploader = dojox.form.Uploader;    
 
+    function fileSizeToString(size) {
+        var units = ["B", "KB", "MB", "GB"];
+        var i = 0;
+        while (size >= 1024) {
+            size /= 1024;
+            ++i;
+        }
+        return size.toFixed(1) + " " + units[i];
+    }
+
+
     var GridClass = declare([Grid, Selection, DijitRegistry], {
         selectionMode: "single",
 
@@ -59,7 +73,8 @@ define([
             {
                 field: "size",
                 label: "Размер",
-                sortable: true
+                sortable: true,
+                formatter: fileSizeToString
             }
         ]
     });
@@ -75,6 +90,8 @@ define([
 
         buildRendering: function () {
             this.inherited(arguments);
+
+            domClass.add(this.domNode, "ngw-file-bucket-widget");
 
             this.toolbar = new Toolbar({
                 region: 'top'
