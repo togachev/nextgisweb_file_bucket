@@ -4,6 +4,7 @@ import uuid
 import os
 import os.path
 from datetime import datetime
+import dateutil
 from shutil import copyfile
 
 from nextgisweb.models import declarative_base
@@ -125,6 +126,14 @@ class _tsamp_attr(SP):
         else:
             return None
 
+    def setter(self, srlzr, value):
+        if isinstance(value, basestring):
+            srlzr.obj.tstamp = dateutil.parser.parse(value)
+        elif value is None:
+            srlzr.obj.tstamp = None
+        else:
+            raise ValidationError("Invalid timestamp value.")
+
 
 class FileBucketSerializer(Serializer):
     identity = FileBucket.identity
@@ -134,4 +143,4 @@ class FileBucketSerializer(Serializer):
         read=DataStructureScope.read,
         write=DataStructureScope.write)
 
-    tstamp = _tsamp_attr(read=MetadataScope.read)
+    tstamp = _tsamp_attr(read=MetadataScope.read, write=MetadataScope.write)
