@@ -91,7 +91,7 @@ class _files_attr(SP):
                 # Файл был загружен через компонент file_upload, копируем его.
                 # TODO: В перспективе наверное лучше заменить на ссылки.
 
-                srcfile, _ = env.file_upload.get_filename(f['id'])
+                srcfile, metafile = env.file_upload.get_filename(f['id'])
                 copyfile(srcfile, targetfile)
 
                 fobj = FileBucketFile(
