@@ -1,10 +1,11 @@
+<%! from nextgisweb_rekod.file_bucket.util import _ %>
 <table class="pure-table pure-table-horizontal" style="width: 100%">
     <thead>
         <tr>
             <th style="width: 5%">#</th>
-            <th style="width: 75%">Наименование</th>
-            <th style="width: 25%">Тип MIME</th>
-            <th style="width: 0%; white-space: nowrap;">Размер, КБ</th>
+            <th style="width: 75%">${tr(_("Name"))}</th>
+            <th style="width: 25%">${tr(_("MIME type"))}</th>
+            <th style="width: 0%; white-space: nowrap;">${tr(_("Size, KB"))}</th>
         </tr>
     </thead>
     %for idx, fobj in enumerate(obj.files, start=1):

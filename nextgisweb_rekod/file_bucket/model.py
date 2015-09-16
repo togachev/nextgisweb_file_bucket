@@ -20,13 +20,14 @@ from nextgisweb.resource import (
     ResourceGroup)
 from nextgisweb.env import env
 
+from .util import _
 
 Base = declarative_base()
 
 
 class FileBucket(Base, Resource):
     identity = 'file_bucket'
-    cls_display_name = "Набор файлов"
+    cls_display_name = _("File bucket")
 
     __scope__ = (DataStructureScope, DataScope)
 

@@ -9,6 +9,7 @@ from nextgisweb.resource import Resource, Widget, resource_factory, DataScope
 from nextgisweb.env import env
 from .model import FileBucket
 
+from .util import _
 
 class Widget(Widget):
     resource = FileBucket
@@ -39,6 +40,6 @@ def setup_pyramid(comp, config):
     ).add_view(file_download, context=FileBucket)
 
     Resource.__psection__.register(
-        key='file_bucket', priority=20, title="Набор файлов",
+        key='file_bucket', priority=20, title=_("File bucket"),
         is_applicable=lambda obj: isinstance(obj, FileBucket),
         template='nextgisweb_rekod:file_bucket/template/section.mako')

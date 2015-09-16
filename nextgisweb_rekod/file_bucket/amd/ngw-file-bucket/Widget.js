@@ -17,6 +17,7 @@ define([
     "dgrid/extensions/DijitRegistry",    
     "ngw/route",
     "ngw-resource/serialize",
+    "ngw-pyramid/i18n!file_bucket",
     // resource
     "xstyle/css!./resource/Widget.css",
     "ngw/dgrid/css"    
@@ -38,7 +39,8 @@ define([
     editor,
     DijitRegistry,
     route,
-    serialize
+    serialize,
+    i18n
 ) {
     // Uploader AMD workaround
     Uploader = dojox.form.Uploader;    
@@ -60,19 +62,19 @@ define([
         columns: [
             {
                 field: "name",
-                label: "Имя файла",
+                label: i18n.gettext("File name"),
                 sortable: true
             },
 
             {
                 field: "mime_type",
-                label: "Тип MIME",
+                label: i18n.gettext("MIME type"),
                 sortable: true
             },
 
             {
                 field: "size",
-                label: "Размер",
+                label: i18n.gettext("Size"),
                 sortable: true,
                 formatter: fileSizeToString
             }
@@ -81,7 +83,7 @@ define([
 
 
     return declare([LayoutContainer, serialize.Mixin], {
-        title: "Набор файлов",
+        title: i18n.gettext("File bucket"),
         serializePrefix: "file_bucket",
 
         constructor: function () {
@@ -98,7 +100,7 @@ define([
             }).placeAt(this);
 
             this.uploader = new Uploader({
-                label: "Загрузить файлы",
+                label: i18n.gettext("Upload files"),
                 iconClass: "dijitIconNewTask",
                 multiple: true,
                 uploadOnSelect: true,
@@ -125,7 +127,7 @@ define([
             }));
 
             this.toolbar.addChild(new Button({
-                label: "Удалить",
+                label: i18n.gettext("Delete"),
                 iconClass: "dijitIconDelete",
                 onClick: lang.hitch(this, function () {
                     for (var key in this.grid.selection) {
