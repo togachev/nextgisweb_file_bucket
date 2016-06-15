@@ -39,7 +39,6 @@ class FileBucketFileBackup(BackupBase):
                 copyfileobj(self.binfd, fd)
 
 
-@Component.registry.register
 class FileBucketComponent(Component):
     identity = 'file_bucket'
     metadata = Base.metadata
