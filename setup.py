@@ -9,17 +9,17 @@ requires = (
 
 entry_points = {
     'nextgisweb.packages': [
-        'nextgisweb_rekod = nextgisweb_rekod:pkginfo',
+        'nextgisweb_filebucket = nextgisweb_filebucket:pkginfo',
     ],
 
     'nextgisweb.amd_packages': [
-        'nextgisweb_rekod = nextgisweb_rekod:amd_packages',
+        'nextgisweb_filebucket = nextgisweb_filebucket:amd_packages',
     ],
 
 }
 
 setup(
-    name='nextgisweb_rekod',
+    name='nextgisweb_filebucket',
     version=version,
     description="",
     long_description="",

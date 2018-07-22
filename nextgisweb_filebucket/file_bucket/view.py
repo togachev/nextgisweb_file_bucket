@@ -42,4 +42,4 @@ def setup_pyramid(comp, config):
     Resource.__psection__.register(
         key='file_bucket', priority=20, title=_("File bucket"),
         is_applicable=lambda obj: isinstance(obj, FileBucket),
-        template='nextgisweb_rekod:file_bucket/template/section.mako')
+        template='nextgisweb_filebucket:file_bucket/template/section.mako')

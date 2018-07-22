@@ -1,12 +1,12 @@
-# Russian translations for nextgisweb_rekod.
+# Russian translations for nextgisweb_filebucket.
 # Copyright (C) 2015 UNKNOWN
-# This file is distributed under the same license as the nextgisweb_rekod
+# This file is distributed under the same license as the nextgisweb_filebucket
 # project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: nextgisweb_rekod 0.0dev-r0\n"
+"Project-Id-Version: nextgisweb_filebucket 0.0dev-r0\n"
 "Report-Msgid-Bugs-To: UNKNOWN\n"
 "POT-Creation-Date: 2015-09-16 17:30+0600\n"
 "PO-Revision-Date: 2015-09-16 17:32+0600\n"
