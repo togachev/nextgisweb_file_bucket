@@ -3,9 +3,9 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 import webtest
 
-TEST_FILE1 = {"name": "rose.flw", "content": bytes("rose")}
+TEST_FILE1 = {"name": "red/rose.flw", "content": bytes("rose")}
 TEST_FILE2 = {"name": "orchid.flw", "content": bytes("orchid")}
-TEST_FILE3 = {"name": "daisy.flw", "content": bytes("daisy")}
+TEST_FILE3 = {"name": "white/daisy.flw", "content": bytes("daisy")}
 
 
 def test_bucket_crud(env, webapp):
@@ -33,7 +33,7 @@ def test_bucket_crud(env, webapp):
 
     resp = webapp.put_json("/api/resource/%d" % bucket_id, {
         "file_bucket": {"files": [{"name": TEST_FILE1["name"]}]}
-    })
+    }, status=200)
     webapp.get("/resource/%d/file/%s" % (bucket_id, TEST_FILE1["name"]), status=200)
     webapp.get("/resource/%d/file/%s" % (bucket_id, TEST_FILE2["name"]), status=404)
 
