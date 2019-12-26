@@ -49,12 +49,8 @@ class FileBucketFile(Base):
     __tablename__ = 'file_bucket_file'
 
     id = db.Column(db.Integer, primary_key=True)
+    file_bucket_id = db.Column(db.ForeignKey(FileBucket.id), nullable=False)
     fileobj_id = db.Column(db.ForeignKey(FileObj.id), nullable=True)
-
-    file_bucket_id = db.Column(
-        db.ForeignKey('file_bucket.id'),
-        nullable=False)
-
     name = db.Column(db.Unicode(255), nullable=False)
     mime_type = db.Column(db.Unicode, nullable=False)
     size = db.Column(db.BigInteger, nullable=False)
