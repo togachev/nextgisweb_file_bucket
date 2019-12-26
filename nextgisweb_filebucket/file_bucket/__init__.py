@@ -4,40 +4,8 @@ import os.path
 from shutil import copyfileobj
 
 from nextgisweb.component import Component
-from nextgisweb.core import BackupBase
 
 from .model import Base, FileBucket
-
-
-@BackupBase.registry.register
-class FileBucketFileBackup(BackupBase):
-    identity = 'file_bucket_file'
-
-    def is_binary(self):
-        return True
-
-    def backup(self):
-        stuuid, name = self.key.split(':', 1)
-        dirname = self.comp.dirname(stuuid)
-        fname = os.path.join(dirname, name)
-        if os.path.isfile(fname):
-            with open(fname, 'rb') as fd:
-                copyfileobj(fd, self.binfd)
-
-        # TODO: Разобраться почему файл может не существовать
-
-    def restore(self):
-        stuuid, name = self.key.split(':', 1)
-        dirname = self.comp.dirname(stuuid, makedirs=True)
-        fname = os.path.join(dirname, name)
-
-        # Файл уже может существовать, например в случае если бекап поверх
-        # разворачивается, в ситуации когда файлы не изменяются это ок.
-
-        if not os.path.isfile(fname):
-            with open(fname, 'wb') as fd:
-                copyfileobj(self.binfd, fd)
-
 
 class FileBucketComponent(Component):
     identity = 'file_bucket'
@@ -62,15 +30,6 @@ class FileBucketComponent(Component):
             os.makedirs(path)
 
         return path
-
-    def backup(self):
-        for i in super(FileBucketComponent, self).backup():
-            yield i
-
-        for file_bucket in FileBucket.query():
-            for f in file_bucket.files:
-                yield FileBucketFileBackup(
-                    self, file_bucket.stuuid + ':' + f.name)
 
     settings_info = (
         dict(key='path', desc=u"Директория для хранения файлов"),
