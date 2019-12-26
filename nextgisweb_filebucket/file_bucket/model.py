@@ -19,6 +19,8 @@ from nextgisweb.resource import (
     ValidationError,
     ResourceGroup)
 from nextgisweb.env import env
+from nextgisweb.file_storage import FileObj
+from nextgisweb.pyramid.exception import InternalServerError
 
 from .util import _
 
@@ -37,22 +39,50 @@ class FileBucket(Base, Resource):
     @classmethod
     def check_parent(self, parent):
         return isinstance(parent, ResourceGroup)
+    
+    @property
+    def is_antique(self):
+        return self.stuuid is not None
 
 
 class FileBucketFile(Base):
     __tablename__ = 'file_bucket_file'
 
+    id = db.Column(db.Integer, primary_key=True)
+    fileobj_id = db.Column(db.ForeignKey(FileObj.id), nullable=True)
+
     file_bucket_id = db.Column(
         db.ForeignKey('file_bucket.id'),
-        primary_key=True)
+        nullable=False)
 
-    name = db.Column(db.Unicode(255), primary_key=True)
+    name = db.Column(db.Unicode(255), nullable=False)
     mime_type = db.Column(db.Unicode, nullable=False)
     size = db.Column(db.BigInteger, nullable=False)
+
+    __table_args__ = (
+        db.UniqueConstraint(file_bucket_id, name),
+    )
+
+    fileobj = db.relationship(FileObj, lazy='joined')
 
     file_bucket = db.relationship(
         FileBucket, foreign_keys=file_bucket_id,
         backref=db.backref('files', cascade='all,delete-orphan'))
+
+
+def find_antique_file(resource, filename):
+    try:
+        fobj = next(i for i in resource.files if i.name == filename)
+    except StopIteration:
+        return None, None
+
+    dirname = env.file_bucket.dirname(resource.stuuid)
+    path = os.path.abspath(os.path.join(dirname, fobj.name))
+    return fobj, path
+
+
+def validate_filename(filename):
+    return not os.path.isabs(filename) and filename == os.path.normpath(filename)
 
 
 class _files_attr(SP):
@@ -63,56 +93,51 @@ class _files_attr(SP):
             srlzr.obj.files)
 
     def setter(self, srlzr, value):
-        if srlzr.obj.stuuid is not None:
-            odir = env.file_bucket.dirname(srlzr.obj.stuuid, makedirs=True)
-        else:
-            odir = None
+        is_antique = srlzr.obj.is_antique
+        if is_antique:
+           srlzr.obj.stuuid = None
 
-        srlzr.obj.stuuid = str(uuid.uuid4().hex)
         srlzr.obj.tstamp = datetime.utcnow()
-
-        dirname = env.file_bucket.dirname(srlzr.obj.stuuid, makedirs=True)
 
         keep = list()
 
         for f in value:
-            keep.append(f['name'])
-            targetfile = os.path.abspath(os.path.join(dirname, f['name']))
 
-            if not targetfile.startswith(dirname):
-                # Проверяем на вещи типа ".." в имени файла или "/" в начале,
-                # в общем в любом случае, если итоговый путь получился за
-                # приделами директории в которой ожидали, то выбрасываем
-                # ошибку валидации.
-
+            if not validate_filename(f['name']):
+                # Проверяем на вещи типа ".." в имени файла или "/" в начале.
                 raise ValidationError("Insecure filename.")
+
+            keep.append(f['name'])
 
             if 'id' in f:
                 # Файл был загружен через компонент file_upload, копируем его.
                 # TODO: В перспективе наверное лучше заменить на ссылки.
 
+                fileobj = env.file_storage.fileobj(component='file_bucket')
+
                 srcfile, metafile = env.file_upload.get_filename(f['id'])
-                copyfile(srcfile, targetfile)
+                dstfile = env.file_storage.filename(fileobj, makedirs=True)
+                copyfile(srcfile, dstfile)
 
-                fobj = FileBucketFile(
+                filebucketfileobj = FileBucketFile(
                     name=f['name'], size=f['size'],
-                    mime_type=f['mime_type'])
+                    mime_type=f['mime_type'], fileobj=fileobj)
 
-                srlzr.obj.files.append(fobj)
+                srlzr.obj.files.append(filebucketfileobj)
 
-            else:
-                # Файл остался из предыдущей версии, его нужно скопировать,
-                # поскольку имя файла так же от клиента получается, его нужно
-                # тоже проверять на принадлежность исходной директории.
+            elif is_antique:
+                # Файл остался из предыдущей версии, его нужно скопировать.
 
-                srcfile = os.path.abspath(os.path.join(odir, f['name']))
-                if not srcfile.startswith(odir):
-                    raise ValidationError("Insecure filename.")
+                filebucketfileobj, srcfile = find_antique_file(srlzr.obj, f['name'])
+                if filebucketfileobj is None:
+                    raise InternalServerError('File %s lost.' % f['name'])
 
-                # Копировать долго, а ссылка должны создаваться быстро,
-                # при том, что файл не изменяется это хороший вариант.
+                fileobj = env.file_storage.fileobj(component='file_bucket')
 
-                os.link(srcfile, targetfile)
+                dstfile = env.file_storage.filename(fileobj, makedirs=True)
+                copyfile(srcfile, dstfile)
+
+                filebucketfileobj.fileobj = fileobj
 
         for fobj in list(srlzr.obj.files):
             if fobj.name not in keep:
