@@ -31,6 +31,10 @@ def test_bucket_crud(env, webapp):
     resp = webapp.get("/resource/%d/file/%s" % (bucket_id, TEST_FILE3["name"]), status=200)
     assert resp.body == TEST_FILE3["content"]
 
+    webapp.put_json("/api/resource/%d" % bucket_id, {
+       "file_bucket": {"files": [{"name": "iam/../bad"}]}
+    }, status=422)
+
     resp = webapp.put_json("/api/resource/%d" % bucket_id, {
         "file_bucket": {"files": [{"name": TEST_FILE1["name"]}]}
     }, status=200)
