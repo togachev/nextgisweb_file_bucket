@@ -20,7 +20,6 @@ from nextgisweb.resource import (
     ResourceGroup)
 from nextgisweb.env import env
 from nextgisweb.file_storage import FileObj
-from nextgisweb.pyramid.exception import InternalServerError
 
 from .util import _
 
@@ -39,10 +38,6 @@ class FileBucket(Base, Resource):
     @classmethod
     def check_parent(self, parent):
         return isinstance(parent, ResourceGroup)
-    
-    @property
-    def is_antique(self):
-        return self.stuuid is not None
 
 
 class FileBucketFile(Base):
@@ -65,16 +60,9 @@ class FileBucketFile(Base):
         FileBucket, foreign_keys=file_bucket_id,
         backref=db.backref('files', cascade='all,delete-orphan'))
 
-
-def find_antique_file(resource, filename):
-    try:
-        fobj = next(i for i in resource.files if i.name == filename)
-    except StopIteration:
-        return None, None
-
-    dirname = env.file_bucket.dirname(resource.stuuid)
-    path = os.path.abspath(os.path.join(dirname, fobj.name))
-    return fobj, path
+    @property
+    def is_antique(self):
+        return self.fileobj_id is None
 
 
 def validate_filename(filename):
@@ -89,10 +77,6 @@ class _files_attr(SP):
             srlzr.obj.files)
 
     def setter(self, srlzr, value):
-        is_antique = srlzr.obj.is_antique
-        if is_antique:
-           srlzr.obj.stuuid = None
-
         srlzr.obj.tstamp = datetime.utcnow()
 
         keep = list()
@@ -120,20 +104,6 @@ class _files_attr(SP):
                     mime_type=f['mime_type'], fileobj=fileobj)
 
                 srlzr.obj.files.append(filebucketfileobj)
-
-            elif is_antique:
-                # Файл остался из предыдущей версии, его нужно скопировать.
-
-                filebucketfileobj, srcfile = find_antique_file(srlzr.obj, f['name'])
-                if filebucketfileobj is None:
-                    raise InternalServerError('File %s lost.' % f['name'])
-
-                fileobj = env.file_storage.fileobj(component='file_bucket')
-
-                dstfile = env.file_storage.filename(fileobj, makedirs=True)
-                copyfile(srcfile, dstfile)
-
-                filebucketfileobj.fileobj = fileobj
 
         for fobj in list(srlzr.obj.files):
             if fobj.name not in keep:

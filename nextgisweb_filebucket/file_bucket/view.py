@@ -7,7 +7,7 @@ from pyramid.httpexceptions import HTTPNotFound
 
 from nextgisweb.resource import Resource, Widget, resource_factory, DataScope
 from nextgisweb.env import env
-from .model import FileBucket, FileBucketFile, find_antique_file
+from .model import FileBucket, FileBucketFile
 
 from .util import _
 
@@ -20,17 +20,15 @@ class Widget(Widget):
 def file_download(resource, request):
     request.resource_permission(DataScope.read)
 
-    if resource.is_antique:
-        path = find_antique_file(resource, request.matchdict['name'])[1]
-        if path is None:
-            raise HTTPNotFound()
+    fname = request.matchdict["name"]
+    fobj = next((i for i in resource.files if i.name == fname), None)
+    if fobj is None:
+        raise HTTPNotFound()
+
+    if fobj.is_antique:
+        dirname = env.file_bucket.dirname(resource.stuuid)
+        path = os.path.abspath(os.path.join(dirname, fobj.name))
     else:
-        fobj = FileBucketFile.filter_by(
-            file_bucket_id=request.matchdict["id"],
-            name=request.matchdict["name"]
-        ).one_or_none()
-        if fobj is None:
-            raise HTTPNotFound()
         path = env.file_storage.filename(fobj.fileobj)
 
     return FileResponse(path, content_type=bytes(fobj.mime_type), request=request)
