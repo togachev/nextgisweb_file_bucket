@@ -5,7 +5,9 @@ import os
 import os.path
 from datetime import datetime
 import dateutil
-from shutil import copyfile
+from shutil import copyfile, copyfileobj
+import zipfile
+import magic
 
 from nextgisweb.models import declarative_base
 from nextgisweb import db
@@ -66,7 +68,39 @@ class FileBucketFile(Base):
 
 
 def validate_filename(filename):
+    # Проверяем на вещи типа ".." в имени файла или "/" в начале.
     return not os.path.isabs(filename) and filename == os.path.normpath(filename)
+
+class _archive_attr(SP):
+
+    def setter(self, srlzr, value):
+        archive_name, metafile = env.file_upload.get_filename(value['id'])
+        archive = zipfile.ZipFile(archive_name, mode='r')
+
+        del srlzr.obj.files[:]
+
+        for file_info in archive.infolist():
+
+            if os.path.isdir(file_info.filename):
+                continue
+
+            if not validate_filename(file_info.filename):
+                raise ValidationError("Insecure filename.")
+
+            fileobj = env.file_storage.fileobj(component='file_bucket')
+
+            dstfile = env.file_storage.filename(fileobj, makedirs=True)
+            with archive.open(file_info.filename, 'r') as sf, open(dstfile, 'w') as df:
+                copyfileobj(sf, df)
+                mime_type = magic.from_buffer(sf.read(1024), mime=True)
+
+            filebucketfileobj = FileBucketFile(
+                name=file_info.filename, size=file_info.file_size,
+                mime_type=mime_type, fileobj=fileobj)
+
+            srlzr.obj.files.append(filebucketfileobj)
+
+        archive.close()
 
 
 class _files_attr(SP):
@@ -84,7 +118,6 @@ class _files_attr(SP):
         for f in value:
 
             if not validate_filename(f['name']):
-                # Проверяем на вещи типа ".." в имени файла или "/" в начале.
                 raise ValidationError("Insecure filename.")
 
             keep.append(f['name'])
@@ -130,6 +163,15 @@ class _tsamp_attr(SP):
 class FileBucketSerializer(Serializer):
     identity = FileBucket.identity
     resclass = FileBucket
+
+    def __init__(self, obj, user, data):
+        if 'files' in data and 'archive' in data:
+            raise ValidationError('"files" and "archive" attributes should not pass together.')
+        super(FileBucketSerializer, self).__init__(obj, user, data)
+
+    archive = _archive_attr(
+        read=None,
+        write=DataStructureScope.write)
 
     files = _files_attr(
         read=DataStructureScope.read,
