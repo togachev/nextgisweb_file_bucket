@@ -5,7 +5,7 @@ import os.path
 from shutil import copyfile
 
 from nextgisweb.command import Command
-from .model import FileBucketFile
+from .model import FileBucketFile, FileBucket
 
 
 @Command.registry.register
@@ -20,6 +20,7 @@ class Update_00_01Command():
     def execute(cls, args, env):
         logger = env.file_bucket.logger
         logger.info("Migrate files to file storage...")
+
         files_moved = 0
         for fbf in FileBucketFile.filter_by(fileobj_id=None):
             dirname = env.file_bucket.dirname(fbf.file_bucket.stuuid)
@@ -33,4 +34,9 @@ class Update_00_01Command():
 
             files_moved += 1
 
-        logger.info("%d files moved", files_moved)
+        fb_count = 0
+        for fb in FileBucket.query().filter(FileBucket.stuuid != None):
+            fb.stuuid = None
+            fb_count += 1
+
+        logger.info("%d files moved from %d file buckets", files_moved, fb_count)
