@@ -9,8 +9,8 @@ from .model import FileBucketFile, FileBucket
 
 
 @Command.registry.register
-class Update_00_01Command():
-    identity = 'file_bucket.update_00_01'
+class MigrateFileStorageCommand():
+    identity = 'file_bucket.migrate_file_storage'
 
     @classmethod
     def argparser_setup(cls, parser, env):

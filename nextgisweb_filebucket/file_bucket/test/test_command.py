@@ -13,7 +13,7 @@ import webtest
 TEST_FILE = {"name": "mie_phyle.txt", "content": bytes("test content")}
 
 
-def test_update_00_01(env, webapp):
+def test_migrate_file_storage(env, webapp):
     webapp.authorization = ("Basic", ("administrator", "admin"))
 
     # Make legacy file_bucket
@@ -38,7 +38,7 @@ def test_update_00_01(env, webapp):
     fb.files.append(fbf)
 
     # Run migrate command
-    cmd = command.Update_00_01Command()
+    cmd = command.MigrateFileStorageCommand()
     cmd.execute(args="", env=env)
 
     # Check
