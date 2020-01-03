@@ -164,11 +164,6 @@ class FileBucketSerializer(Serializer):
     identity = FileBucket.identity
     resclass = FileBucket
 
-    def __init__(self, obj, user, data):
-        if 'files' in data and 'archive' in data:
-            raise ValidationError('"files" and "archive" attributes should not pass together.')
-        super(FileBucketSerializer, self).__init__(obj, user, data)
-
     archive = _archive_attr(
         read=None,
         write=DataStructureScope.write)
@@ -178,3 +173,8 @@ class FileBucketSerializer(Serializer):
         write=DataStructureScope.write)
 
     tstamp = _tsamp_attr(read=MetadataScope.read, write=MetadataScope.write)
+
+    def deserialize(self):
+        if 'files' in self.data and 'archive' in self.data:
+            raise ValidationError('"files" and "archive" attributes should not pass together.')
+        super(self.__class__, self).deserialize()
