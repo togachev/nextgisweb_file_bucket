@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+from __future__ import division, absolute_import, print_function, unicode_literals
 import os.path
 
 from pyramid.response import FileResponse
@@ -31,7 +31,7 @@ def file_download(resource, request):
     else:
         path = env.file_storage.filename(fobj.fileobj)
 
-    return FileResponse(path, content_type=bytes(fobj.mime_type), request=request)
+    return FileResponse(path, request=request)
 
 
 def setup_pyramid(comp, config):
