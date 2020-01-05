@@ -3,11 +3,11 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 import webtest
 import zipfile
-import StringIO
+import six
 
-TEST_FILE1 = {"name": "red/rose.flw", "content": bytes("rose")}
-TEST_FILE2 = {"name": "orchid.flw", "content": bytes("orchid")}
-TEST_FILE3 = {"name": "white/daisy.flw", "content": bytes("daisy")}
+TEST_FILE1 = {"name": "red/rose.flw", "content": "rose".encode("utf-8")}
+TEST_FILE2 = {"name": "orchid.flw", "content": "orchid".encode("utf-8")}
+TEST_FILE3 = {"name": "white/daisy.flw", "content": "daisy".encode("utf-8")}
 
 
 def test_bucket_crud(env, webapp):
@@ -49,8 +49,8 @@ def test_bucket_crud(env, webapp):
 def test_create_from_archive(env, webapp):
     webapp.authorization = ("Basic", ("administrator", "admin"))
 
-    data = StringIO.StringIO()
-    archive = zipfile.ZipFile(data, "a", zipfile.ZIP_DEFLATED, False)
+    data = six.BytesIO()
+    archive = zipfile.ZipFile(data, mode="a", compression=zipfile.ZIP_DEFLATED, allowZip64=False)
     archive.writestr(TEST_FILE1["name"], TEST_FILE1["content"])
     archive.writestr(TEST_FILE2["name"], TEST_FILE2["content"])
     archive.close()

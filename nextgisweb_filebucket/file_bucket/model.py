@@ -90,7 +90,7 @@ class _archive_attr(SP):
             fileobj = env.file_storage.fileobj(component='file_bucket')
 
             dstfile = env.file_storage.filename(fileobj, makedirs=True)
-            with archive.open(file_info.filename, 'r') as sf, open(dstfile, 'w') as df:
+            with archive.open(file_info.filename, 'r') as sf, open(dstfile, 'wb') as df:
                 copyfileobj(sf, df)
                 mime_type = magic.from_buffer(sf.read(1024), mime=True)
 
