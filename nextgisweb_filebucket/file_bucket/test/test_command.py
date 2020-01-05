@@ -9,8 +9,9 @@ from nextgisweb_filebucket.file_bucket.model import (
 )
 
 import webtest
+import transaction
 
-TEST_FILE = {"name": "mie_phyle.txt", "content": bytes("test content")}
+TEST_FILE = {"name": "mie_phyle.txt", "content": "test content".encode("utf-8")}
 
 
 def test_migrate_file_storage(env, webapp):
@@ -30,12 +31,13 @@ def test_migrate_file_storage(env, webapp):
     legacy_dir = env.file_bucket.dirname(fb.stuuid, makedirs=True)
 
     srcfile = os.path.abspath(os.path.join(legacy_dir, TEST_FILE["name"]))
-    with open(srcfile, "w") as f:
+    with open(srcfile, "wb") as f:
         f.write(TEST_FILE["content"])
 
     fbf = FileBucketFile(name=TEST_FILE["name"], size=1, mime_type="no_matter")
 
     fb.files.append(fbf)
+    transaction.commit()
 
     # Run migrate command
     cmd = command.MigrateFileStorageCommand()
@@ -43,11 +45,12 @@ def test_migrate_file_storage(env, webapp):
 
     # Check
     fb = FileBucket.filter_by(id=bucket_id).one()
+    assert fb.stuuid == None
     fbf = fb.files[0]
     assert fbf.fileobj
 
     dstfile = env.file_storage.filename(fbf.fileobj)
-    with open(dstfile, "r") as f:
+    with open(dstfile, "rb") as f:
         assert f.read() == TEST_FILE["content"]
 
     webapp.delete("/api/resource/%d" % bucket_id)
