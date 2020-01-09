@@ -106,9 +106,8 @@ class _archive_attr(SP):
 class _files_attr(SP):
 
     def getter(self, srlzr):
-        return map(
-            lambda f: dict(name=f.name, size=f.size, mime_type=f.mime_type),
-            srlzr.obj.files)
+        return [dict(name=f.name, size=f.size, mime_type=f.mime_type)
+            for f in srlzr.obj.files]
 
     def setter(self, srlzr, value):
         srlzr.obj.tstamp = datetime.utcnow()
@@ -138,7 +137,7 @@ class _files_attr(SP):
 
                 srlzr.obj.files.append(filebucketfileobj)
 
-        for fobj in list(srlzr.obj.files):
+        for fobj in srlzr.obj.files:
             if fobj.name not in keep:
                 srlzr.obj.files.remove(fobj)
 
