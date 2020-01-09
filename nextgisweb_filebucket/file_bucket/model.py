@@ -8,6 +8,7 @@ import dateutil
 from shutil import copyfile, copyfileobj
 import zipfile
 import magic
+import six
 
 from nextgisweb.models import declarative_base
 from nextgisweb import db
@@ -74,6 +75,9 @@ def validate_filename(filename):
 class _archive_attr(SP):
 
     def setter(self, srlzr, value):
+        def is_dir(file_info):
+            return file_info.is_dir() if six.PY3 else file_info.filename[-1] == '/'
+
         archive_name, metafile = env.file_upload.get_filename(value['id'])
         archive = zipfile.ZipFile(archive_name, mode='r')
 
@@ -81,7 +85,7 @@ class _archive_attr(SP):
 
         for file_info in archive.infolist():
 
-            if os.path.isdir(file_info.filename):
+            if is_dir(file_info):
                 continue
 
             if not validate_filename(file_info.filename):
