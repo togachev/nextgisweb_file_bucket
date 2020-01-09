@@ -31,7 +31,7 @@ def file_download(resource, request):
     else:
         path = env.file_storage.filename(fobj.fileobj)
 
-    return FileResponse(path, request=request)
+    return FileResponse(path, content_type=fobj.mime_type, request=request)
 
 
 def setup_pyramid(comp, config):
