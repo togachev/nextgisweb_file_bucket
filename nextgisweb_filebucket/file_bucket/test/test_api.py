@@ -70,6 +70,7 @@ def test_create_from_archive(env, webapp):
     bucket_id = resp.json["id"]
 
     resp = webapp.get("/resource/%d/file/%s" % (bucket_id, TEST_FILE1["name"]), status=200)
+    assert resp.content_type == "text/plain"
     assert resp.body == TEST_FILE1["content"]
     resp = webapp.get("/resource/%d/file/%s" % (bucket_id, TEST_FILE2["name"]), status=200)
     assert resp.body == TEST_FILE2["content"]

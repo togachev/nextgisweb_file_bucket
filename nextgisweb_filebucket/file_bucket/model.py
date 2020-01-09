@@ -96,7 +96,7 @@ class _archive_attr(SP):
             dstfile = env.file_storage.filename(fileobj, makedirs=True)
             with archive.open(file_info.filename, 'r') as sf, open(dstfile, 'wb') as df:
                 copyfileobj(sf, df)
-                mime_type = magic.from_buffer(sf.read(1024), mime=True)
+            mime_type = magic.from_file(dstfile, mime=True)  # ZipExtFile is seekable since py>=3.7.2
 
             filebucketfileobj = FileBucketFile(
                 name=file_info.filename, size=file_info.file_size,
