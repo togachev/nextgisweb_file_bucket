@@ -21,7 +21,10 @@ def file_download(resource, request):
     request.resource_permission(DataScope.read)
 
     fname = request.matchdict["name"]
-    fobj = next((i for i in resource.files if i.name == fname), None)
+    fobj = FileBucketFile.filter_by(
+        file_bucket_id=resource.id,
+        name=fname
+    ).one_or_none()
     if fobj is None:
         raise HTTPNotFound()
 
