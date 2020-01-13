@@ -14,13 +14,13 @@ define([
     "dgrid/OnDemandGrid",
     "dgrid/Selection",
     "dgrid/editor",
-    "dgrid/extensions/DijitRegistry",    
+    "dgrid/extensions/DijitRegistry",
     "ngw/route",
     "ngw-resource/serialize",
     "ngw-pyramid/i18n!file_bucket",
     // resource
     "xstyle/css!./resource/Widget.css",
-    "ngw/dgrid/css"    
+    "ngw/dgrid/css"
 ], function (
     declare,
     lang,
@@ -43,7 +43,7 @@ define([
     i18n
 ) {
     // Uploader AMD workaround
-    Uploader = dojox.form.Uploader;    
+    Uploader = dojox.form.Uploader;
 
     function fileSizeToString(size) {
         var units = ["B", "KB", "MB", "GB"];
@@ -88,6 +88,7 @@ define([
 
         constructor: function () {
             this.store = new Observable(new Memory({idProperty: "name"}));
+            this.archiveId = null;
         },
 
         buildRendering: function () {
@@ -99,7 +100,9 @@ define([
                 region: 'top'
             }).placeAt(this);
 
-            this.uploader = new Uploader({
+            var uploaders = [];
+
+            this.fileUploader = new Uploader({
                 label: i18n.gettext("Upload files"),
                 iconClass: "dijitIconNewTask",
                 multiple: true,
@@ -107,24 +110,46 @@ define([
                 url: route.file_upload.upload(),
                 name: "file"
             }).placeAt(this.toolbar);
+            uploaders.push(this.fileUploader);
 
-            this.uploader.on("complete", lang.hitch(this, function (data) {
+            this.fileUploader.on("complete", lang.hitch(this, function (data) {
                 array.forEach(data.upload_meta, function (f) {
                     this.store.put(f);
                 }, this);
-
-                domStyle.set(this.progressbar.domNode, 'display', 'none');
             }));
 
-            this.uploader.on("begin", lang.hitch(this, function () {
-                domStyle.set(this.progressbar.domNode, 'display', 'block');
-            }));
+            if (this.composite.operation === "create") {
+                this.archiveUploader = new Uploader({
+                    label: i18n.gettext("Upload archive"),
+                    iconClass: "dijitIconDocuments",
+                    multiple: false,
+                    uploadOnSelect: true,
+                    url: route.file_upload.upload(),
+                    name: "file"
+                }).placeAt(this.toolbar);
+                uploaders.push(this.archiveUploader);
 
-            this.uploader.on("progress", lang.hitch(this, function (evt) {
-                if (evt.type == "progress") {
-                    this.progressbar.set('value', evt.decimal * 100);
-                }
-            }));
+                this.archiveUploader.on("complete", lang.hitch(this, function (data) {
+                    this.store.query().forEach(function (f) { this.store.remove(f.name) }, this);
+                    this.archiveId = data.upload_meta[0].id;
+    
+                    domClass.add(this.domNode, 'archive-loaded');
+                }));
+            }
+
+            uploaders.forEach(function(uploader) {
+                uploader.on("complete", lang.hitch(this, function () {
+                    domStyle.set(this.progressbar.domNode, 'display', 'none');
+                }));
+                uploader.on("begin", lang.hitch(this, function () {
+                    domStyle.set(this.progressbar.domNode, 'display', 'block');
+                }));
+                uploader.on("progress", lang.hitch(this, function (evt) {
+                    if (evt.type === "progress") {
+                        this.progressbar.set('value', evt.decimal * 100);
+                    }
+                }));
+            }, this);
 
             this.toolbar.addChild(new Button({
                 label: i18n.gettext("Delete"),
@@ -134,7 +159,7 @@ define([
                         this.store.remove(key);
                     }
                 })
-            }));             
+            }));
 
             this.progressbar = new ProgressBar({
                 style: "float: right; margin-right: 4px; width: 10em; display: none;"
@@ -152,14 +177,21 @@ define([
         deserializeInMixin: function (data) {
             var files = data.file_bucket.files;
             for (var key in files) { this.store.add(files[key]) }
-        },       
+        },
 
         serializeInMixin: function (data) {
             if (data.file_bucket === undefined) { data.file_bucket = {}; }
-            data.file_bucket.files = [];
 
-            var files = data.file_bucket.files;
-            this.store.query().forEach(function (f) { files.push(f) });
+            if (this.archiveId) {
+                data.file_bucket.archive = {id: this.archiveId};
+
+                this.archiveId = null;
+            } else {
+                data.file_bucket.files = [];
+
+                var files = data.file_bucket.files;
+                this.store.query().forEach(function (f) { files.push(f) });
+            }
         }
 
     });

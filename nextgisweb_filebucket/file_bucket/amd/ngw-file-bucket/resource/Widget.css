@@ -1,2 +1,3 @@
 .ngw-file-bucket-widget .field-mime_type { width: 24em; }
 .ngw-file-bucket-widget .field-size { width: 8em; text-align: right; }
+.ngw-file-bucket-widget.archive-loaded { pointer-events: none; opacity: 0.4; }

@@ -39,7 +39,11 @@ msgstr "Размер"
 msgid "Upload files"
 msgstr "Загрузить файлы"
 
-#: amd/ngw-file-bucket/Widget.js:130
+#: amd/ngw-file-bucket/Widget.js:123
+msgid "Upload archive"
+msgstr "Загрузить архив"
+
+#: amd/ngw-file-bucket/Widget.js:155
 msgid "Delete"
 msgstr "Удалить"
 
