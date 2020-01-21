@@ -40,7 +40,7 @@ def file_download(resource, request):
 def setup_pyramid(comp, config):
     config.add_route(
         'file_bucket.file_download',
-        r'/resource/{id}/file/{name:.*}',
+        r'/api/resource/{id}/file/{name:.*}',
         factory=resource_factory
     ).add_view(file_download, context=FileBucket)
 

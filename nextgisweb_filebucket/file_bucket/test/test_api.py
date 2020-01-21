@@ -26,11 +26,11 @@ def test_bucket_crud(env, webapp):
     resp = webapp.post_json("/api/resource/", data, status=201)
     bucket_id = resp.json["id"]
 
-    resp = webapp.get("/resource/%d/file/%s" % (bucket_id, TEST_FILE1["name"]), status=200)
+    resp = webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE1["name"]), status=200)
     assert resp.body == TEST_FILE1["content"]
-    resp = webapp.get("/resource/%d/file/%s" % (bucket_id, TEST_FILE2["name"]), status=200)
+    resp = webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE2["name"]), status=200)
     assert resp.body == TEST_FILE2["content"]
-    resp = webapp.get("/resource/%d/file/%s" % (bucket_id, TEST_FILE3["name"]), status=200)
+    resp = webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE3["name"]), status=200)
     assert resp.body == TEST_FILE3["content"]
 
     webapp.put_json("/api/resource/%d" % bucket_id, {
@@ -40,11 +40,11 @@ def test_bucket_crud(env, webapp):
     resp = webapp.put_json("/api/resource/%d" % bucket_id, {
         "file_bucket": {"files": [{"name": TEST_FILE1["name"]}]}
     }, status=200)
-    webapp.get("/resource/%d/file/%s" % (bucket_id, TEST_FILE1["name"]), status=200)
-    webapp.get("/resource/%d/file/%s" % (bucket_id, TEST_FILE2["name"]), status=404)
+    webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE1["name"]), status=200)
+    webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE2["name"]), status=404)
 
     webapp.delete("/api/resource/%d" % bucket_id, status=200)
-    webapp.get("/resource/%d/file/%s" % (bucket_id, TEST_FILE3["name"]), status=404)
+    webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE3["name"]), status=404)
 
 def test_create_from_archive(env, webapp):
     webapp.authorization = ("Basic", ("administrator", "admin"))
@@ -69,10 +69,10 @@ def test_create_from_archive(env, webapp):
     resp = webapp.post_json("/api/resource/", bucket_data, status=201)
     bucket_id = resp.json["id"]
 
-    resp = webapp.get("/resource/%d/file/%s" % (bucket_id, TEST_FILE1["name"]), status=200)
+    resp = webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE1["name"]), status=200)
     assert resp.content_type == "text/plain"
     assert resp.body == TEST_FILE1["content"]
-    resp = webapp.get("/resource/%d/file/%s" % (bucket_id, TEST_FILE2["name"]), status=200)
+    resp = webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE2["name"]), status=200)
     assert resp.body == TEST_FILE2["content"]
 
     webapp.delete("/api/resource/%d" % bucket_id, status=200)
