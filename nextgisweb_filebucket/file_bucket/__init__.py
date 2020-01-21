@@ -20,7 +20,8 @@ class FileBucketComponent(Component):
             self.env.core.mksdir(self)
 
     def setup_pyramid(self, config):
-        from . import view  # NOQA
+        from . import api, view  # NOQA
+        api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
 
     def dirname(self, stuuid, makedirs=False):
