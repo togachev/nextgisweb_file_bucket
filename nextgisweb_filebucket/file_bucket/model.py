@@ -140,8 +140,7 @@ class _files_attr(SP):
         for f in removed_files:
             srlzr.obj.files.remove(f)
 
-        for name in files_info:  # New file
-            file_info = files_info[name]
+        for name, file_info in files_info.items():  # New file
             fileobj = env.file_storage.fileobj(component='file_bucket')
 
             srcfile, metafile = env.file_upload.get_filename(file_info['id'])
