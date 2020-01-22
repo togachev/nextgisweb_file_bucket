@@ -117,34 +117,42 @@ class _files_attr(SP):
     def setter(self, srlzr, value):
         srlzr.obj.tstamp = datetime.utcnow()
 
-        keep = list()
-
+        files_info = dict()
         for f in value:
-
-            if not validate_filename(f['name']):
+            name = f.pop('name')
+            if not validate_filename(name):
                 raise ValidationError("Insecure filename.")
+            files_info[name] = f
 
-            keep.append(f['name'])
+        removed_files = list()
+        for filebucket_file in srlzr.obj.files:
+            if filebucket_file.name not in files_info:  # Removed file
+                removed_files.append(filebucket_file)
+            else:
+                file_info = files_info.pop(filebucket_file.name)
+                if 'id' in file_info:  # Updated file
+                    srcfile, metafile = env.file_upload.get_filename(file_info['id'])
+                    dstfile = env.file_storage.filename(filebucket_file.fileobj, makedirs=False)
+                    copyfile(srcfile, dstfile)
+                else:  # Untouched file
+                    pass
 
-            if 'id' in f:
-                # Файл был загружен через компонент file_upload, копируем его.
-                # TODO: В перспективе наверное лучше заменить на ссылки.
+        for f in removed_files:
+            srlzr.obj.files.remove(f)
 
-                fileobj = env.file_storage.fileobj(component='file_bucket')
+        for name in files_info:  # New file
+            file_info = files_info[name]
+            fileobj = env.file_storage.fileobj(component='file_bucket')
 
-                srcfile, metafile = env.file_upload.get_filename(f['id'])
-                dstfile = env.file_storage.filename(fileobj, makedirs=True)
-                copyfile(srcfile, dstfile)
+            srcfile, metafile = env.file_upload.get_filename(file_info['id'])
+            dstfile = env.file_storage.filename(fileobj, makedirs=True)
+            copyfile(srcfile, dstfile)
 
-                filebucketfileobj = FileBucketFile(
-                    name=f['name'], size=f['size'],
-                    mime_type=f['mime_type'], fileobj=fileobj)
+            filebucket_file = FileBucketFile(
+                name=name, size=file_info['size'],
+                mime_type=file_info['mime_type'], fileobj=fileobj)
 
-                srlzr.obj.files.append(filebucketfileobj)
-
-        for fobj in srlzr.obj.files:
-            if fobj.name not in keep:
-                srlzr.obj.files.remove(fobj)
+            srlzr.obj.files.append(filebucket_file)
 
 
 class _tsamp_attr(SP):

@@ -37,11 +37,18 @@ def test_bucket_crud(env, webapp):
        "file_bucket": {"files": [{"name": "iam/../bad"}]}
     }, status=422)
 
-    resp = webapp.put_json("/api/resource/%d" % bucket_id, {
+    webapp.put_json("/api/resource/%d" % bucket_id, {
         "file_bucket": {"files": [{"name": TEST_FILE1["name"]}]}
     }, status=200)
     webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE1["name"]), status=200)
     webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE2["name"]), status=404)
+
+    resp = webapp.post("/api/component/file_upload/upload", {
+        "file": webtest.Upload(TEST_FILE1["name"], TEST_FILE1["content"]
+    )})
+    webapp.put_json("/api/resource/%d" % bucket_id, {
+        "file_bucket": {"files": resp.json["upload_meta"]}
+    }, status=200)
 
     webapp.delete("/api/resource/%d" % bucket_id, status=200)
     webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE3["name"]), status=404)
