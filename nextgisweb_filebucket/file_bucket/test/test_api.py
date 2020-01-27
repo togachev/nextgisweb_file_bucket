@@ -53,14 +53,13 @@ def test_bucket_crud(env, webapp):
     webapp.delete("/api/resource/%d" % bucket_id, status=200)
     webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE3["name"]), status=404)
 
-def test_create_from_archive(env, webapp):
+def test_archive(env, webapp):
     webapp.authorization = ("Basic", ("administrator", "admin"))
 
     data = six.BytesIO()
-    archive = zipfile.ZipFile(data, mode="a", compression=zipfile.ZIP_DEFLATED, allowZip64=False)
-    archive.writestr(TEST_FILE1["name"], TEST_FILE1["content"])
-    archive.writestr(TEST_FILE2["name"], TEST_FILE2["content"])
-    archive.close()
+    with zipfile.ZipFile(data, mode="a", compression=zipfile.ZIP_DEFLATED, allowZip64=False) as archive:
+        archive.writestr(TEST_FILE1["name"], TEST_FILE1["content"])
+        archive.writestr(TEST_FILE2["name"], TEST_FILE2["content"])
     data.seek(0)
 
     resp = webapp.put("/api/component/file_upload/upload", data.read())
@@ -81,5 +80,10 @@ def test_create_from_archive(env, webapp):
     assert resp.body == TEST_FILE1["content"]
     resp = webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE2["name"]), status=200)
     assert resp.body == TEST_FILE2["content"]
+
+    resp = webapp.get("/api/resource/%d/file_bucket/export" % bucket_id, status=200)
+    with zipfile.ZipFile(six.BytesIO(resp.body), mode="r", compression=zipfile.ZIP_DEFLATED, allowZip64=False) as archive:
+        assert archive.read(TEST_FILE1["name"]) == TEST_FILE1["content"]
+        assert archive.read(TEST_FILE2["name"]) == TEST_FILE2["content"]
 
     webapp.delete("/api/resource/%d" % bucket_id, status=200)
