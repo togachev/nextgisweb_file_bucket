@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
+from nextgisweb.dynmenu import DynItem, Label, Link
 from nextgisweb.resource import Resource, Widget
 
 from .model import FileBucket
@@ -12,7 +13,19 @@ class Widget(Widget):
     amdmod = 'ngw-file-bucket/Widget'
 
 
+class FileBucketMenu(DynItem):
+    def build(self, args):
+        yield Label('file_bucket', _('File bucket'))
+
+        yield Link(
+            'file_bucket/export', _('Export'),
+            lambda args: args.request.route_url('file_bucket.export', id=args.obj.id),
+        )
+
+
 def setup_pyramid(comp, config):
+    Resource.__dynmenu__.add(FileBucketMenu())
+
     Resource.__psection__.register(
         key='file_bucket', priority=20, title=_("File bucket"),
         is_applicable=lambda obj: isinstance(obj, FileBucket),
