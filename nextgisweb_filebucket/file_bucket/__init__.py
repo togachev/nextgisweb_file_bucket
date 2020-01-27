@@ -34,5 +34,5 @@ class FileBucketComponent(Component):
         return path
 
     settings_info = (
-        dict(key='path', desc=u"Директория для хранения файлов"),
+        dict(key='path', desc=u"Директория для хранения файлов (устарело)"),
     )
