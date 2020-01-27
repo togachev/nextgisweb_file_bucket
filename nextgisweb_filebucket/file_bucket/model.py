@@ -64,8 +64,13 @@ class FileBucketFile(Base):
         backref=db.backref('files', cascade='all,delete-orphan'))
 
     @property
-    def is_antique(self):
-        return self.fileobj_id is None
+    def path(self):
+        if self.fileobj_id is None:
+            dirname = env.file_bucket.dirname(self.file_bucket.stuuid, makedirs=False)
+            path = os.path.abspath(os.path.join(dirname, fobj.name))
+        else:
+            path = env.file_storage.filename(self.fileobj)
+        return path
 
 
 def validate_filename(filename):
@@ -79,33 +84,31 @@ class _archive_attr(SP):
             return file_info.is_dir() if six.PY3 else file_info.filename[-1] == '/'
 
         archive_name, metafile = env.file_upload.get_filename(value['id'])
-        archive = zipfile.ZipFile(archive_name, mode='r')
 
-        del srlzr.obj.files[:]
+        with zipfile.ZipFile(archive_name, mode='r') as archive:
+            del srlzr.obj.files[:]
 
-        for file_info in archive.infolist():
+            for file_info in archive.infolist():
 
-            if is_dir(file_info):
-                continue
+                if is_dir(file_info):
+                    continue
 
-            if not validate_filename(file_info.filename):
-                raise ValidationError("Insecure filename.")
+                if not validate_filename(file_info.filename):
+                    raise ValidationError("Insecure filename.")
 
-            fileobj = env.file_storage.fileobj(component='file_bucket')
+                fileobj = env.file_storage.fileobj(component='file_bucket')
 
-            dstfile = env.file_storage.filename(fileobj, makedirs=True)
-            with archive.open(file_info.filename, 'r') as sf, open(dstfile, 'w+b') as df:
-                copyfileobj(sf, df)
-                df.seek(0)
-                mime_type = magic.from_buffer(df.read(1024), mime=True)
+                dstfile = env.file_storage.filename(fileobj, makedirs=True)
+                with archive.open(file_info.filename, 'r') as sf, open(dstfile, 'w+b') as df:
+                    copyfileobj(sf, df)
+                    df.seek(0)
+                    mime_type = magic.from_buffer(df.read(1024), mime=True)
 
-            filebucketfileobj = FileBucketFile(
-                name=file_info.filename, size=file_info.file_size,
-                mime_type=mime_type, fileobj=fileobj)
+                filebucketfileobj = FileBucketFile(
+                    name=file_info.filename, size=file_info.file_size,
+                    mime_type=mime_type, fileobj=fileobj)
 
-            srlzr.obj.files.append(filebucketfileobj)
-
-        archive.close()
+                srlzr.obj.files.append(filebucketfileobj)
 
 
 class _files_attr(SP):
