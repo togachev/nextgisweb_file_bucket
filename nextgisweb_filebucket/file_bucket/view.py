@@ -17,10 +17,11 @@ class FileBucketMenu(DynItem):
     def build(self, args):
         yield Label('file_bucket', _('File bucket'))
 
-        yield Link(
-            'file_bucket/export', _('Export'),
-            lambda args: args.request.route_url('file_bucket.export', id=args.obj.id),
-        )
+        if isinstance(args.obj, FileBucket):
+            yield Link(
+                'file_bucket/export', _('Export'),
+                lambda args: args.request.route_url('file_bucket.export', id=args.obj.id),
+            )
 
 
 def setup_pyramid(comp, config):
