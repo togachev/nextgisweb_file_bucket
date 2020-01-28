@@ -19,31 +19,47 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.0\n"
 
-#: model.py:30 amd/ngw-file-bucket/Widget.js:86
+#: model.py:34 amd/ngw-file-bucket/Widget.js:90
 msgid "File bucket"
 msgstr "Набор файлов"
 
-#: amd/ngw-file-bucket/Widget.js:65
+#: amd/ngw-file-bucket/Widget.js:69
 msgid "File name"
 msgstr "Имя файла"
 
-#: amd/ngw-file-bucket/Widget.js:71 template/section.mako:7
+#: amd/ngw-file-bucket/Widget.js:75 template/section.mako:7
 msgid "MIME type"
 msgstr "Тип MIME"
 
-#: amd/ngw-file-bucket/Widget.js:77
+#: amd/ngw-file-bucket/Widget.js:81
 msgid "Size"
 msgstr "Размер"
 
-#: amd/ngw-file-bucket/Widget.js:103
+#: amd/ngw-file-bucket/Widget.js:110
 msgid "Upload files"
 msgstr "Загрузить файлы"
 
-#: amd/ngw-file-bucket/Widget.js:123
+#: amd/ngw-file-bucket/Widget.js:126
+msgid "Action confirmation"
+msgstr "Подтверждение действия"
+
+#: amd/ngw-file-bucket/Widget.js:134
+msgid "This operation will overwrite all resource files. Continue?"
+msgstr "Эта операция перезапишет все файлы ресурса. Продолжить?"
+
+#: amd/ngw-file-bucket/Widget.js:142
+msgid "OK"
+msgstr "ОК"
+
+#: amd/ngw-file-bucket/Widget.js:150
+msgid "Cancel"
+msgstr "Отмена"
+
+#: amd/ngw-file-bucket/Widget.js:166
 msgid "Upload archive"
 msgstr "Загрузить архив"
 
-#: amd/ngw-file-bucket/Widget.js:155
+#: amd/ngw-file-bucket/Widget.js:216
 msgid "Delete"
 msgstr "Удалить"
 
