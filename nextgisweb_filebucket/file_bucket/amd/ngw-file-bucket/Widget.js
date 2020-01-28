@@ -3,13 +3,15 @@ define([
     "dojo/_base/lang",
     "dojo/_base/array",
     "dojo/dom-style",
-    "dojo/dom-class",   
+    "dojo/dom-class",
+    "dojo/dom-construct",
     "dojo/store/Memory",
     "dojo/store/Observable",
     "dijit/layout/LayoutContainer",
     "dijit/form/Button",
     "dijit/Toolbar",
     "dijit/ProgressBar",
+    "dijit/Dialog",
     "dojox/form/Uploader",
     "dgrid/OnDemandGrid",
     "dgrid/Selection",
@@ -27,12 +29,14 @@ define([
     array,
     domStyle,
     domClass,
+    domConstruct,
     Memory,
     Observable,
     LayoutContainer,
     Button,
     Toolbar,
     ProgressBar,
+    Dialog,
     Uploader,
     Grid,
     Selection,
@@ -118,24 +122,81 @@ define([
                 }, this);
             }));
 
-            if (this.composite.operation === "create") {
-                this.archiveUploader = new Uploader({
-                    label: i18n.gettext("Upload archive"),
-                    iconClass: "dijitIconDocuments",
-                    multiple: false,
-                    uploadOnSelect: true,
-                    url: route.file_upload.upload(),
-                    name: "file"
-                }).placeAt(this.toolbar);
-                uploaders.push(this.archiveUploader);
+            var ConfirmDialogClass = declare([Dialog], {
+                title: i18n.gettext("Action confirmation"),
+                style: "width: 400px",
 
-                this.archiveUploader.on("complete", lang.hitch(this, function (data) {
-                    this.store.query().forEach(function (f) { this.store.remove(f.name) }, this);
-                    this.archiveId = data.upload_meta[0].id;
-    
-                    domClass.add(this.domNode, 'archive-loaded');
-                }));
-            }
+                buildRendering: function () {
+                    this.inherited(arguments);
+
+                    this.contentArea = domConstruct.create("div", {
+                        class: "dijitDialogPaneContentArea",
+                        innerHTML: i18n.gettext("This operation will overwrite all resource files. Continue?")
+                    }, this.containerNode);
+
+                    this.actionBar = domConstruct.create("div", {
+                        class: "dijitDialogPaneActionBar"
+                    }, this.containerNode);
+
+                    new Button({
+                        label: i18n.gettext("OK"),
+                        onClick: lang.hitch(this, function () {
+                            this.hide();
+                            this._callback(true);
+                        })
+                    }).placeAt(this.actionBar);
+
+                    new Button({
+                        label: i18n.gettext("Cancel"),
+                        onClick: lang.hitch(this, function () {
+                            this.hide();
+                            this._callback(false);
+                        })
+                    }).placeAt(this.actionBar);
+                },
+
+                show: function (callback) {
+                    this.inherited(arguments);
+                    this._callback = callback;
+                }
+            });
+
+            var _operation = this.composite.operation;
+            var ArchiveUploaderClass = declare([Uploader], {
+                label: i18n.gettext("Upload archive"),
+                iconClass: "dijitIconDocuments",
+                multiple: false,
+                uploadOnSelect: true,
+                url: route.file_upload.upload(),
+                name: "file",
+                _warned: false,
+                _confirmDlg: ConfirmDialogClass(),
+                upload: function () {
+                    var args = arguments;
+                    if (_operation === "create" || this._warned) {
+                        this.inherited(args);
+                    } else {
+                        this._confirmDlg.show(lang.hitch(this, function (confirmed) {
+                            this._warned = true;
+                            if (confirmed) {
+                                this.inherited(args);
+                            } else {
+                                this.reset();
+                            }
+                        }));
+                    }
+                }
+            });
+
+            this.archiveUploader = ArchiveUploaderClass().placeAt(this.toolbar);
+            uploaders.push(this.archiveUploader);
+
+            this.archiveUploader.on("complete", lang.hitch(this, function (data) {
+                this.store.query().forEach(function (f) { this.store.remove(f.name) }, this);
+                this.archiveId = data.upload_meta[0].id;
+
+                domClass.add(this.domNode, 'archive-loaded');
+            }));
 
             uploaders.forEach(function(uploader) {
                 uploader.on("complete", lang.hitch(this, function () {
