@@ -10,7 +10,7 @@ import zipfile
 import magic
 import six
 
-from nextgisweb.models import declarative_base
+from nextgisweb.models import DBSession, declarative_base
 from nextgisweb import db
 from nextgisweb.resource import (
     Resource,
@@ -77,6 +77,7 @@ def validate_filename(filename):
     # Проверяем на вещи типа ".." в имени файла или "/" в начале.
     return not os.path.isabs(filename) and filename == os.path.normpath(filename)
 
+
 class _archive_attr(SP):
 
     def setter(self, srlzr, value):
@@ -85,8 +86,15 @@ class _archive_attr(SP):
 
         archive_name, metafile = env.file_upload.get_filename(value['id'])
 
+        old_files = list(srlzr.obj.files)
+
+        with DBSession.no_autoflush:
+            for f in old_files:
+                srlzr.obj.files.remove(f)
+
+        DBSession.flush()
+
         with zipfile.ZipFile(archive_name, mode='r') as archive:
-            del srlzr.obj.files[:]
 
             for file_info in archive.infolist():
 
