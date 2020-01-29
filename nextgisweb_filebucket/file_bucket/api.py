@@ -29,14 +29,26 @@ def file_download(resource, request):
 def export(resource, request):
     request.resource_permission(DataScope.read)
 
-    data = BytesIO()
-    with zipfile.ZipFile(data, mode='a', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as archive:
-        for f in resource.files:
-            archive.write(f.path, f.name)
-    data.seek(0)
+    def zip_stream(files):
+        data = BytesIO()
+
+        def message(from_pos):
+            pos = data.tell()
+            data.seek(from_pos)
+            return data.read(pos - from_pos)
+
+        with zipfile.ZipFile(data, mode='a', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as archive:
+            for f in files:
+                pos_before = data.tell()
+                archive.write(f.path, f.name)
+                yield message(pos_before)
+
+            epilogue_pos = data.tell()
+
+        yield message(epilogue_pos)
 
     return Response(
-        data.read(),
+        app_iter=zip_stream(resource.files),
         content_type='application/zip',
         content_disposition='attachment; filename="%d.zip"' % resource.id,
     )
