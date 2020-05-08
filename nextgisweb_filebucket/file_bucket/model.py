@@ -67,7 +67,7 @@ class FileBucketFile(Base):
     def path(self):
         if self.fileobj_id is None:
             dirname = env.file_bucket.dirname(self.file_bucket.stuuid, makedirs=False)
-            path = os.path.abspath(os.path.join(dirname, fobj.name))
+            path = os.path.abspath(os.path.join(dirname, self.name))
         else:
             path = env.file_storage.filename(self.fileobj)
         return path
