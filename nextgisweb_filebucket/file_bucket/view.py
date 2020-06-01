@@ -7,6 +7,7 @@ from nextgisweb.resource import Resource, Widget
 from .model import FileBucket
 from .util import _
 
+
 class Widget(Widget):
     resource = FileBucket
     operation = ('create', 'update')

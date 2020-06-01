@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
+
 import os.path
-from shutil import copyfileobj
 
 from nextgisweb.component import Component
 
 from .model import Base, FileBucket
 from . import command
+
 
 class FileBucketComponent(Component):
     identity = 'file_bucket'
