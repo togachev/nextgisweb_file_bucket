@@ -12,12 +12,12 @@ define([
     "dijit/Toolbar",
     "dijit/ProgressBar",
     "dijit/Dialog",
-    "dojox/form/Uploader",
     "dgrid/OnDemandGrid",
     "dgrid/Selection",
     "dgrid/editor",
     "dgrid/extensions/DijitRegistry",
     "ngw/route",
+    "ngw-file-upload/FileUploader",
     "ngw-resource/serialize",
     "ngw-pyramid/i18n!file_bucket",
     // resource
@@ -37,18 +37,15 @@ define([
     Toolbar,
     ProgressBar,
     Dialog,
-    Uploader,
     Grid,
     Selection,
     editor,
     DijitRegistry,
     route,
+    Uploader,
     serialize,
     i18n
 ) {
-    // Uploader AMD workaround
-    Uploader = dojox.form.Uploader;
-
     function fileSizeToString(size) {
         var units = ["B", "KB", "MB", "GB"];
         var i = 0;
