@@ -17,7 +17,7 @@
                 </a>
             </td>
             <td>${fobj.mime_type}</td>
-            <td>${fobj.size / 1024}</td>
+            <td>${fobj.size / 1024 if fobj.size >= 1024 else round(fobj.size / 1024.0, 3)}</td>
         </tr>
     %endfor
 </table>
