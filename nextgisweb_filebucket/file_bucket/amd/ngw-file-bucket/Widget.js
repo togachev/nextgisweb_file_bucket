@@ -101,9 +101,9 @@ define([
                 region: 'top'
             }).placeAt(this);
 
-            var uploaders = [];
+            this.uploaders = [];
 
-            this.fileUploader = new Uploader({
+            var fileUploader = new Uploader({
                 label: i18n.gettext("Upload files"),
                 iconClass: "dijitIconNewTask",
                 multiple: true,
@@ -111,9 +111,9 @@ define([
                 url: route.file_upload.upload(),
                 name: "file"
             }).placeAt(this.toolbar);
-            uploaders.push(this.fileUploader);
+            this.uploaders.push(fileUploader);
 
-            this.fileUploader.on("complete", lang.hitch(this, function (data) {
+            fileUploader.on("complete", lang.hitch(this, function (data) {
                 array.forEach(data.upload_meta, function (f) {
                     this.store.put(f);
                 }, this);
@@ -185,17 +185,17 @@ define([
                 }
             });
 
-            this.archiveUploader = ArchiveUploaderClass().placeAt(this.toolbar);
-            uploaders.push(this.archiveUploader);
+            var archiveUploader = ArchiveUploaderClass().placeAt(this.toolbar);
+            this.uploaders.push(archiveUploader);
 
-            this.archiveUploader.on("complete", lang.hitch(this, function (data) {
+            archiveUploader.on("complete", lang.hitch(this, function (data) {
                 this.store.query().forEach(function (f) { this.store.remove(f.name) }, this);
                 this.archiveId = data.upload_meta[0].id;
 
                 domClass.add(this.domNode, 'archive-loaded');
             }));
 
-            uploaders.forEach(function(uploader) {
+            this.uploaders.forEach(function(uploader) {
                 uploader.on("complete", lang.hitch(this, function () {
                     domStyle.set(this.progressbar.domNode, 'display', 'none');
                 }));
@@ -230,6 +230,15 @@ define([
             domStyle.set(this.grid.domNode, "border", "none");
 
             this.addChild(this.grid);
+        },
+
+        validateDataInMixin: function () {
+            for (var i = 0; i < this.uploaders.length; i++) {
+                if (this.uploaders[i].inProgress) {
+                    return false;
+                }
+            }
+            return true;
         },
 
         deserializeInMixin: function (data) {
