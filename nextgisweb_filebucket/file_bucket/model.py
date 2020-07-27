@@ -94,7 +94,7 @@ class _archive_attr(SP):
 
         DBSession.flush()
 
-        with zipfile.ZipFile(archive_name, mode='r') as archive:
+        with zipfile.ZipFile(archive_name, mode='r', allowZip64=True) as archive:
 
             for file_info in archive.infolist():
 

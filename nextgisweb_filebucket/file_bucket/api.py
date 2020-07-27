@@ -37,7 +37,7 @@ def export(resource, request):
             data.seek(from_pos)
             return data.read(pos - from_pos)
 
-        with zipfile.ZipFile(data, mode='a', compression=zipfile.ZIP_DEFLATED, allowZip64=False) as archive:
+        with zipfile.ZipFile(data, mode='a', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as archive:
             for f in files:
                 pos_before = data.tell()
                 archive.write(f.path, f.name)
