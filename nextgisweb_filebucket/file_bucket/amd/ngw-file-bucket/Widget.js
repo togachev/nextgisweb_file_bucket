@@ -251,8 +251,6 @@ define([
 
             if (this.archiveId) {
                 data.file_bucket.archive = {id: this.archiveId};
-
-                this.archiveId = null;
             } else {
                 data.file_bucket.files = [];
 
