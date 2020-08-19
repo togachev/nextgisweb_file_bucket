@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, absolute_import, print_function, unicode_literals
 
-import zipfile
+import zipstream
 
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileResponse, Response
-from six import BytesIO
 
 from nextgisweb.resource import DataScope, resource_factory
 
@@ -29,26 +28,12 @@ def file_download(resource, request):
 def export(resource, request):
     request.resource_permission(DataScope.read)
 
-    def zip_stream(files):
-        data = BytesIO()
-
-        def message(from_pos):
-            pos = data.tell()
-            data.seek(from_pos)
-            return data.read(pos - from_pos)
-
-        with zipfile.ZipFile(data, mode='a', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as archive:
-            for f in files:
-                pos_before = data.tell()
-                archive.write(f.path, f.name)
-                yield message(pos_before)
-
-            epilogue_pos = data.tell()
-
-        yield message(epilogue_pos)
+    zip_stream = zipstream.ZipFile(mode='w', compression=zipstream.ZIP_DEFLATED, allowZip64=True)
+    for f in resource.files:
+        zip_stream.write(f.path, arcname=f.name)
 
     return Response(
-        app_iter=zip_stream(resource.files),
+        app_iter=zip_stream,
         content_type='application/zip',
         content_disposition='attachment; filename="%d.zip"' % resource.id,
     )

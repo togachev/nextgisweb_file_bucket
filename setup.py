@@ -1,10 +1,11 @@
 from setuptools import setup, find_packages
-import sys, os
+
 
 version = '0.1'
 
 requires = (
     'nextgisweb',
+    'zipstream-new==1.1.7',
 )
 
 entry_points = {
