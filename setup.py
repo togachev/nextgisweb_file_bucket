@@ -1,7 +1,9 @@
+import io
 from setuptools import setup, find_packages
 
 
-version = '0.1'
+with io.open('VERSION', 'r') as fd:
+    VERSION = fd.read().rstrip()
 
 requires = (
     'nextgisweb',
@@ -21,7 +23,7 @@ entry_points = {
 
 setup(
     name='nextgisweb_filebucket',
-    version=version,
+    version=VERSION,
     description="",
     long_description="",
     classifiers=[],

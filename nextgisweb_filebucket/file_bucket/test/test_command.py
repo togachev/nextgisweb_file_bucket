@@ -5,10 +5,9 @@ import os.path
 from nextgisweb_filebucket.file_bucket import command
 from nextgisweb_filebucket.file_bucket.model import (
     FileBucket,
-    FileBucketFile
+    FileBucketFile,
 )
 
-import webtest
 import transaction
 
 TEST_FILE = {"name": "mie_phyle.txt", "content": "test content".encode("utf-8")}
