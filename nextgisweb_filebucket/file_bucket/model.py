@@ -35,7 +35,6 @@ class FileBucket(Base, Resource):
 
     __scope__ = (DataStructureScope, DataScope)
 
-    stuuid = db.Column(db.Unicode(32))
     tstamp = db.Column(db.DateTime())
 
     @classmethod
@@ -65,12 +64,7 @@ class FileBucketFile(Base):
 
     @property
     def path(self):
-        if self.fileobj_id is None:
-            dirname = env.file_bucket.dirname(self.file_bucket.stuuid, makedirs=False)
-            path = os.path.abspath(os.path.join(dirname, self.name))
-        else:
-            path = env.file_storage.filename(self.fileobj)
-        return path
+        return env.file_storage.filename(self.fileobj)
 
 
 def validate_filename(filename):
