@@ -14,11 +14,10 @@ class FileBucketComponent(Component):
     metadata = Base.metadata
 
     def initialize(self):
-        self.path = self.settings.get('path') or self.env.core.gtsdir(self)
+        self.path = self.env.core.gtsdir(self)
 
     def initialize_db(self):
-        if 'path' not in self.settings:
-            self.env.core.mksdir(self)
+        self.env.core.mksdir(self)
 
     def setup_pyramid(self, config):
         from . import api, view  # NOQA
@@ -33,7 +32,3 @@ class FileBucketComponent(Component):
             os.makedirs(path)
 
         return path
-
-    settings_info = (
-        dict(key='path', desc=u"Директория для хранения файлов (устарело)"),
-    )
