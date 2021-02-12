@@ -1,0 +1,1 @@
+INSERT INTO core_migration VALUES ('file_bucket', '00000000');
