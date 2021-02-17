@@ -5,8 +5,10 @@ import os.path
 
 from nextgisweb.component import Component
 
-from .model import Base, FileBucket
-from . import command
+from .model import Base, FileBucket, FileBucketFile
+from . import command  # NOQA
+
+__all__ = ['FileBucket', 'FileBucketFile']
 
 
 class FileBucketComponent(Component):
