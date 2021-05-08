@@ -19,10 +19,9 @@ define([
     "ngw/route",
     "ngw-file-upload/FileUploader",
     "ngw-resource/serialize",
-    "ngw-pyramid/i18n!file_bucket",
+    "@nextgisweb/pyramid/i18n!",
     // resource
-    "xstyle/css!./resource/Widget.css",
-    "ngw/dgrid/css"
+    "xstyle/css!./resource/Widget.css"
 ], function (
     declare,
     lang,
