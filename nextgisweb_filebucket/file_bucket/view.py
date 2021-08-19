@@ -19,10 +19,11 @@ class FileBucketMenu(DynItem):
         yield Label('file_bucket', _('File bucket'))
 
         if isinstance(args.obj, FileBucket):
-            yield Link(
-                'file_bucket/export', _('Export'),
-                lambda args: args.request.route_url('file_bucket.export', id=args.obj.id),
-            )
+            if args.obj.has_export_permission(args.request.user):
+                yield Link(
+                    'file_bucket/export', _('Export'),
+                    lambda args: args.request.route_url('resource.export', id=args.obj.id),
+                )
 
 
 def setup_pyramid(comp, config):
