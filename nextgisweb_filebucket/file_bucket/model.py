@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import os
 import os.path
 from datetime import datetime
@@ -8,7 +5,6 @@ import dateutil
 from shutil import copyfile, copyfileobj
 import zipfile
 import magic
-import six
 
 from nextgisweb.models import DBSession, declarative_base
 from nextgisweb import db
@@ -75,9 +71,6 @@ def validate_filename(filename):
 class _archive_attr(SP):
 
     def setter(self, srlzr, value):
-        def is_dir(file_info):
-            return file_info.is_dir() if six.PY3 else file_info.filename[-1] == '/'
-
         archive_name, metafile = env.file_upload.get_filename(value['id'])
 
         old_files = list(srlzr.obj.files)
@@ -92,7 +85,7 @@ class _archive_attr(SP):
 
             for file_info in archive.infolist():
 
-                if is_dir(file_info):
+                if file_info.is_dir():
                     continue
 
                 if not validate_filename(file_info.filename):
@@ -168,7 +161,7 @@ class _tsamp_attr(SP):
             return None
 
     def setter(self, srlzr, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             srlzr.obj.tstamp = dateutil.parser.parse(value)
         elif value is None:
             srlzr.obj.tstamp = None
@@ -193,4 +186,4 @@ class FileBucketSerializer(Serializer):
     def deserialize(self):
         if 'files' in self.data and 'archive' in self.data:
             raise ValidationError('"files" and "archive" attributes should not pass together.')
-        super(self.__class__, self).deserialize()
+        super().deserialize()

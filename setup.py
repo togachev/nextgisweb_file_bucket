@@ -6,7 +6,7 @@ with io.open('VERSION', 'r') as fd:
     VERSION = fd.read().rstrip()
 
 requires = (
-    'nextgisweb>=4.0.0.dev2',
+    'nextgisweb>=4.0.0.dev5',
     'zipstream-new==1.1.7',
 )
 
@@ -35,6 +35,7 @@ setup(
     packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
     include_package_data=True,
     zip_safe=False,
+    python_requires=">=3.8.*, <4",
     install_requires=requires,
     entry_points=entry_points,
 )

@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import division, absolute_import, print_function, unicode_literals
-
 import os.path
 from nextgisweb_filebucket.file_bucket import command
 from nextgisweb_filebucket.file_bucket.model import (
