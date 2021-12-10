@@ -89,7 +89,7 @@ class _archive_attr(SP):
                     continue
 
                 if not validate_filename(file_info.filename):
-                    raise ValidationError("Insecure filename.")
+                    raise ValidationError(message="Insecure filename.")
 
                 fileobj = env.file_storage.fileobj(component='file_bucket')
 
@@ -119,7 +119,7 @@ class _files_attr(SP):
         for f in value:
             name = f.pop('name')
             if not validate_filename(name):
-                raise ValidationError("Insecure filename.")
+                raise ValidationError(message="Insecure filename.")
             files_info[name] = f
 
         removed_files = list()
@@ -166,7 +166,7 @@ class _tsamp_attr(SP):
         elif value is None:
             srlzr.obj.tstamp = None
         else:
-            raise ValidationError("Invalid timestamp value.")
+            raise ValidationError(message="Invalid timestamp value.")
 
 
 class FileBucketSerializer(Serializer):
@@ -185,5 +185,5 @@ class FileBucketSerializer(Serializer):
 
     def deserialize(self):
         if 'files' in self.data and 'archive' in self.data:
-            raise ValidationError('"files" and "archive" attributes should not pass together.')
+            raise ValidationError(message="'files' and 'archive' attributes should not pass together.")
         super().deserialize()
