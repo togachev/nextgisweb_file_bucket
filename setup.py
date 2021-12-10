@@ -7,7 +7,7 @@ with io.open('VERSION', 'r') as fd:
 
 requires = (
     'nextgisweb>=4.1.0.dev3',
-    'zipstream-new==1.1.8',
+    'zipstream-new==1.1.*',
 )
 
 entry_points = {
