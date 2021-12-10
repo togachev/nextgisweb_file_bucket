@@ -8,7 +8,8 @@ TEST_FILE2 = {"name": "orchid.flw", "content": "orchid".encode("utf-8")}
 TEST_FILE3 = {"name": "white/daisy.flw", "content": "daisy".encode("utf-8")}
 
 
-def test_bucket_crud(env, webapp):
+def test_bucket_crud(ngw_webtest_app):
+    webapp = ngw_webtest_app
     webapp.authorization = ("Basic", ("administrator", "admin"))
 
     resp = webapp.post("/api/component/file_upload/upload", [
@@ -52,7 +53,8 @@ def test_bucket_crud(env, webapp):
     webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE3["name"]), status=404)
 
 
-def test_archive(env, webapp):
+def test_archive(ngw_webtest_app):
+    webapp = ngw_webtest_app
     webapp.authorization = ("Basic", ("administrator", "admin"))
 
     def make_archive(files):
