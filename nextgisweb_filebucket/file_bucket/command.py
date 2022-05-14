@@ -2,6 +2,7 @@ import os.path
 from shutil import copyfile
 import transaction
 
+from nextgisweb.lib.logging import logger
 from nextgisweb.command import Command
 from .model import FileBucketFile, FileBucket
 
@@ -16,7 +17,6 @@ class MigrateFileStorageCommand():
 
     @classmethod
     def execute(cls, args, env):
-        logger = env.file_bucket.logger
         logger.info("Migrate files to file storage...")
 
         files_moved = fb_count = 0
