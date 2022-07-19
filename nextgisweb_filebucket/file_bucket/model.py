@@ -71,6 +71,8 @@ def validate_filename(filename):
 class _archive_attr(SP):
 
     def setter(self, srlzr, value):
+        srlzr.obj.tstamp = datetime.utcnow()
+
         archive_name, metafile = env.file_upload.get_filename(value['id'])
 
         old_files = list(srlzr.obj.files)
