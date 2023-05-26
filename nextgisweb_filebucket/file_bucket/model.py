@@ -6,8 +6,11 @@ from shutil import copyfile, copyfileobj
 import zipfile
 import magic
 
-from nextgisweb.models import DBSession, declarative_base
-from nextgisweb import db
+from nextgisweb.env import env
+from nextgisweb.env.model import DBSession, declarative_base
+from nextgisweb.core.exception import ValidationError
+from nextgisweb.file_storage import FileObj
+from nextgisweb.lib import db
 from nextgisweb.resource import (
     Resource,
     Serializer,
@@ -15,10 +18,8 @@ from nextgisweb.resource import (
     DataStructureScope,
     DataScope,
     MetadataScope,
-    ValidationError,
-    ResourceGroup)
-from nextgisweb.env import env
-from nextgisweb.file_storage import FileObj
+    ResourceGroup,
+)
 
 from .util import _
 

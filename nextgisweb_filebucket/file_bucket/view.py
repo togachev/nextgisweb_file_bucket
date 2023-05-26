@@ -1,5 +1,5 @@
 
-from nextgisweb.dynmenu import DynItem, Label, Link
+from nextgisweb.lib.dynmenu import DynItem, Label, Link
 from nextgisweb.resource import Resource, Widget
 
 from .model import FileBucket

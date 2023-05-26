@@ -1,6 +1,6 @@
 import os.path
 
-from nextgisweb.component import Component
+from nextgisweb.env import Component
 
 from .model import Base, FileBucket, FileBucketFile
 from . import command  # NOQA

@@ -2,8 +2,9 @@ import os.path
 from shutil import copyfile
 import transaction
 
+from nextgisweb.env.legacy_command import Command
 from nextgisweb.lib.logging import logger
-from nextgisweb.command import Command
+
 from .model import FileBucketFile, FileBucket
 
 
