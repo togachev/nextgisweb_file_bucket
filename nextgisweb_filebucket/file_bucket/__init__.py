@@ -3,7 +3,6 @@ import os.path
 from nextgisweb.env import Component
 
 from .model import Base, FileBucket, FileBucketFile
-from . import command  # NOQA
 
 __all__ = ['FileBucket', 'FileBucketFile']
 
