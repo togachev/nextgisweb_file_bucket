@@ -1,25 +1,27 @@
 import os
 import os.path
-from datetime import datetime
-import dateutil
-from shutil import copyfile, copyfileobj
 import zipfile
+from datetime import datetime
+from shutil import copyfile, copyfileobj
+
+import dateutil
 import magic
 
 from nextgisweb.env import env
 from nextgisweb.env.model import DBSession, declarative_base
+from nextgisweb.lib import db
+
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
-from nextgisweb.lib import db
 from nextgisweb.resource import (
-    Resource,
-    Serializer,
-    SerializedProperty as SP,
-    DataStructureScope,
     DataScope,
+    DataStructureScope,
     MetadataScope,
+    Resource,
     ResourceGroup,
+    Serializer,
 )
+from nextgisweb.resource import SerializedProperty as SP
 
 from .util import _
 
@@ -112,7 +114,8 @@ class _archive_attr(SP):
 class _files_attr(SP):
 
     def getter(self, srlzr):
-        return [dict(name=f.name, size=f.size, mime_type=f.mime_type)
+        return [
+            dict(name=f.name, size=f.size, mime_type=f.mime_type)
             for f in srlzr.obj.files]
 
     def setter(self, srlzr, value):

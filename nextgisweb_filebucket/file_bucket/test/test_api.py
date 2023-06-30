@@ -1,7 +1,7 @@
+import zipfile
 from io import BytesIO
 
 import webtest
-import zipfile
 
 TEST_FILE1 = {"name": "red/rose.flw", "content": "rose".encode("utf-8")}
 TEST_FILE2 = {"name": "orchid.flw", "content": "orchid".encode("utf-8")}
@@ -33,7 +33,7 @@ def test_bucket_crud(ngw_webtest_app):
     assert resp.body == TEST_FILE3["content"]
 
     webapp.put_json("/api/resource/%d" % bucket_id, {
-       "file_bucket": {"files": [{"name": "iam/../bad"}]}
+        "file_bucket": {"files": [{"name": "iam/../bad"}]}
     }, status=422)
 
     webapp.put_json("/api/resource/%d" % bucket_id, {
@@ -43,8 +43,8 @@ def test_bucket_crud(ngw_webtest_app):
     webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE2["name"]), status=404)
 
     resp = webapp.post("/api/component/file_upload/upload", {
-        "file": webtest.Upload(TEST_FILE1["name"], TEST_FILE1["content"]
-    )})
+        "file": webtest.Upload(TEST_FILE1["name"], TEST_FILE1["content"])
+    })
     webapp.put_json("/api/resource/%d" % bucket_id, {
         "file_bucket": {"files": resp.json["upload_meta"]}
     }, status=200)

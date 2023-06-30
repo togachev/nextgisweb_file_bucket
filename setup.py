@@ -1,6 +1,5 @@
 import io
-from setuptools import setup, find_packages
-
+from setuptools import find_packages, setup
 
 with io.open('VERSION', 'r') as fd:
     VERSION = fd.read().rstrip()

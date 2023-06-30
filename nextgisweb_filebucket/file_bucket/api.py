@@ -1,5 +1,4 @@
 import zipstream
-
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileResponse, Response
 
