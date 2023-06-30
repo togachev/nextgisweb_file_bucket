@@ -11,12 +11,12 @@ requires = (
 
 entry_points = {
     'nextgisweb.packages': [
-        'nextgisweb_filebucket = nextgisweb_filebucket:pkginfo',
+        'nextgisweb_file_bucket = nextgisweb:single_component',
     ],
 }
 
 setup(
-    name='nextgisweb_filebucket',
+    name='nextgisweb_file_bucket',
     version=VERSION,
     description='File bucket extension for NextGIS Web',
     author='NextGIS',
