@@ -1,4 +1,3 @@
-<%! from nextgisweb_file_bucket.file_bucket.util import _ %>
 <table class="pure-table pure-table-horizontal" style="width: 100%">
     <thead>
         <tr>

@@ -1,11 +1,11 @@
 
+from nextgisweb.env import _
 from nextgisweb.lib.dynmenu import DynItem, Label, Link
 
 from nextgisweb.resource import Resource, Widget
 from nextgisweb.resource.view import resource_sections
 
 from .model import FileBucket
-from .util import _
 
 
 class Widget(Widget):

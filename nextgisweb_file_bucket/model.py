@@ -7,8 +7,7 @@ from shutil import copyfile, copyfileobj
 import dateutil
 import magic
 
-from nextgisweb.env import env
-from nextgisweb.env.model import DBSession, declarative_base
+from nextgisweb.env import DBSession, _, declarative_base, env
 from nextgisweb.lib import db
 
 from nextgisweb.core.exception import ValidationError
@@ -22,8 +21,6 @@ from nextgisweb.resource import (
     Serializer,
 )
 from nextgisweb.resource import SerializedProperty as SP
-
-from .util import _
 
 Base = declarative_base()
 
