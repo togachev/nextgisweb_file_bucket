@@ -2,12 +2,8 @@ import os.path
 
 from nextgisweb.env import Component
 
-from .model import Base
-
 
 class FileBucketComponent(Component):
-    identity = 'file_bucket'
-    metadata = Base.metadata
 
     def initialize(self):
         self.path = self.env.core.gtsdir(self)
