@@ -4,11 +4,20 @@
     "lang": "ru",
     "plural_forms": "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"
   },
+  "ERROR: duplicate key violates unique constraint.": [
+    ""
+  ],
   "File bucket": [
     "Набор файлов"
   ],
+  "File resource": [
+    ""
+  ],
   "Export": [
     "Экспорт"
+  ],
+  "Files": [
+    "Файлы"
   ],
   "File name": [
     "Имя файла"
@@ -45,11 +54,5 @@
   ],
   "Size, KB": [
     "Размер, КБ"
-  ],
-  "Nested File Editor": [
-    "Редактор вложенных файлов"
-  ],
-  "Files": [
-    "Файлы"
   ]
 }

@@ -27,6 +27,7 @@ class FileBucketMenu(DynItem):
                     'file_bucket/export', _('Export'),
                     lambda args: args.request.route_url('resource.export', id=args.obj.id),
                 )
+
 @viewargs(renderer='react')
 def file_resource(resource, request):
     if resource.cls in ['vector_layer', 'postgis_layer']:

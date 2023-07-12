@@ -3,12 +3,11 @@ from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import FileResponse, Response
 
 from nextgisweb.pyramid import viewargs
-from nextgisweb.resource import DataScope, resource_factory, DataStructureScope, ResourceScope
+from nextgisweb.resource import Resource, DataScope, resource_factory, DataStructureScope, ResourceScope
 
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from nextgisweb.postgis.exception import ExternalDatabaseError
 from nextgisweb.resource.exception import ResourceError
-
 from nextgisweb.env import _, DBSession
 
 from .model import FileBucket, FileBucketFile, FileResource
@@ -70,6 +69,38 @@ def file_resource_delete_all(request):
     DBSession.flush()
     return None
 
+@viewargs(renderer='json')
+def file_resource_show(resource, request):
+    result = list()
+    try:
+        query = DBSession.query(FileResource, FileBucketFile, Resource) \
+            .join(FileBucketFile, FileResource.file_resource_id == FileBucketFile.id) \
+            .join(Resource, FileBucketFile.file_bucket_id == Resource.id) \
+            .filter(FileResource.id == resource.id)
+        for fr, fbf, res in query:
+            result.append(dict(
+                resource_id = fr.id,
+                file_resource_id = fr.file_resource_id,
+                id = fbf.id,
+                file_bucket_id = fbf.file_bucket_id,
+                fileobj_id = fbf.fileobj_id,
+                name=fbf.name,
+                mime_type = fbf.mime_type,
+                size = fbf.size,
+                link = request.route_url('file_bucket.file_download', id=fbf.file_bucket_id, name=fbf.name),
+                res_name = res.display_name,
+            ))
+        status = len(result) > 0 if True else False
+    except KeyError:
+        result=None
+        status=False
+
+
+    return dict(
+        result=result,
+        status=status)
+
+
 def setup_pyramid(comp, config):
     config.add_view(
         file_download, route_name='resource.file_download', context=FileBucket)
@@ -109,3 +140,10 @@ def setup_pyramid(comp, config):
     ).add_view(
         file_resource_delete_all
     )
+
+    config.add_route(
+        'file_resource.show',
+        r'/api/file-resource/{id:\d+}/show',
+        factory=resource_factory,
+        client=('id',)
+    ).add_view(file_resource_show)
