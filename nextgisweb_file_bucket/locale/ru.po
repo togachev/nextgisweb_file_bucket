@@ -1,16 +1,29 @@
-#: amd/ngw-file-bucket/Widget.js:86 model.py:34 view.py:19 view.py:32
+#: api.py:53
+msgid "ERROR: duplicate key violates unique constraint."
+msgstr ""
+
+#: amd/ngw-file-bucket/Widget.js:86 model.py:29 view.py:22 view.py:75
 msgid "File bucket"
 msgstr "Набор файлов"
 
-#: view.py:23
+#: model.py:70
+msgid "File resource"
+msgstr ""
+
+#: view.py:27
 msgid "Export"
 msgstr "Экспорт"
+
+#: view.py:59
+msgid "Files"
+msgstr "Файлы"
 
 #: amd/ngw-file-bucket/Widget.js:65
 msgid "File name"
 msgstr "Имя файла"
 
-#: amd/ngw-file-bucket/Widget.js:71 template/section.mako:7
+#: amd/ngw-file-bucket/Widget.js:71 nodepkg/file-resource/FileResource.js:82
+#: template/resource_section.mako:6
 msgid "MIME type"
 msgstr "Тип MIME"
 
@@ -46,11 +59,14 @@ msgstr "Загрузить архив"
 msgid "Delete"
 msgstr "Удалить"
 
-#: template/section.mako:6
+#: nodepkg/file-resource/FileResource.js:76 template/resource_section.mako:5
 msgid "Name"
 msgstr "Наименование"
 
-#: template/section.mako:8
+#: nodepkg/file-resource/FileResource.js:87 template/resource_section.mako:7
 msgid "Size, KB"
 msgstr "Размер, КБ"
+
+#~ msgid "Nested File Editor"
+#~ msgstr "Редактор вложенных файлов"
 

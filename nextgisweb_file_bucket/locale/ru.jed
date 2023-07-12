@@ -1,0 +1,55 @@
+{
+  "": {
+    "domain": "file_bucket",
+    "lang": "ru",
+    "plural_forms": "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"
+  },
+  "File bucket": [
+    "Набор файлов"
+  ],
+  "Export": [
+    "Экспорт"
+  ],
+  "File name": [
+    "Имя файла"
+  ],
+  "MIME type": [
+    "Тип MIME"
+  ],
+  "Size": [
+    "Размер"
+  ],
+  "Upload files": [
+    "Загрузить файлы"
+  ],
+  "Action confirmation": [
+    "Подтверждение действия"
+  ],
+  "This operation will overwrite all resource files. Continue?": [
+    "Эта операция перезапишет все файлы ресурса. Продолжить?"
+  ],
+  "OK": [
+    "ОК"
+  ],
+  "Cancel": [
+    "Отмена"
+  ],
+  "Upload archive": [
+    "Загрузить архив"
+  ],
+  "Delete": [
+    "Удалить"
+  ],
+  "Name": [
+    "Наименование"
+  ],
+  "Size, KB": [
+    "Размер, КБ"
+  ],
+  "Nested File Editor": [
+    "Редактор вложенных файлов"
+  ],
+  "Files": [
+    "Файлы"
+  ]
+}

@@ -17,6 +17,7 @@ from nextgisweb.resource import (
     DataStructureScope,
     MetadataScope,
     Resource,
+    ResourceScope,
     ResourceGroup,
     Serializer,
 )
@@ -56,9 +57,24 @@ class FileBucketFile(Base):
         FileBucket, foreign_keys=file_bucket_id,
         backref=db.backref('files', cascade='all,delete-orphan'))
 
+    file_resource_id = db.relationship("FileResource", cascade="all,delete",
+        backref="file_bucket_file")
+
     @property
     def path(self):
         return env.file_storage.filename(self.fileobj)
+
+class FileResource(Base):
+    __tablename__ = 'file_resource'
+    identity = 'file_resource'
+    cls_display_name = _("File resource")
+
+    __scope__ = (DataStructureScope, DataScope)
+    id = db.Column(db.Integer, primary_key=True)
+    file_resource_id = db.Column(
+        db.ForeignKey(FileBucketFile.id),
+        primary_key=True
+    )
 
 
 def validate_filename(filename):
