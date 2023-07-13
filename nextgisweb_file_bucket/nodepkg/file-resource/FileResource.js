@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { errorModal } from "@nextgisweb/gui/error";
 import "./FileResource.less";
-import i18n from "@nextgisweb/pyramid/i18n!file_bucket";
+import i18n from "@nextgisweb/pyramid/i18n";
 import Select from 'react-select';
 import getSelectStyle from "@nextgisweb/resource/map_list/selectStyle";
 import makeAnimated from 'react-select/animated';

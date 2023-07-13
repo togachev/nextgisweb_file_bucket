@@ -145,5 +145,4 @@ def setup_pyramid(comp, config):
         'file_resource.show',
         r'/api/file-resource/{id:\d+}/show',
         factory=resource_factory,
-        client=('id',)
     ).add_view(file_resource_show)
