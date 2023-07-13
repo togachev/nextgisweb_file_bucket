@@ -30,7 +30,7 @@ class FileBucketMenu(DynItem):
 
 @viewargs(renderer='react')
 def file_resource(resource, request):
-    if resource.cls in ['vector_layer', 'postgis_layer']:
+    if resource.cls in ['vector_layer', 'postgis_layer', 'raster_layer', 'wmsclient_layer', 'tmsclient_layer']:
         if resource.has_permission(PERM_UPDATE, request.user):
             fileList = list() # список всех файлов
             fileItem = list() # список файлов ресурса

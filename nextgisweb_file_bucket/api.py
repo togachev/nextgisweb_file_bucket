@@ -13,6 +13,7 @@ from nextgisweb.env import _, DBSession
 from .model import FileBucket, FileBucketFile, FileResource
 
 PERM_UPDATE = ResourceScope.update
+PERM_READ = ResourceScope.read
 
 def file_download(resource, request):
     request.resource_permission(DataScope.read)
@@ -71,6 +72,7 @@ def file_resource_delete_all(request):
 
 @viewargs(renderer='json')
 def file_resource_show(resource, request):
+    request.resource_permission(PERM_READ)
     result = list()
     try:
         query = DBSession.query(FileResource, FileBucketFile, Resource) \
@@ -95,11 +97,9 @@ def file_resource_show(resource, request):
         result=None
         status=False
 
-
     return dict(
         result=result,
         status=status)
-
 
 def setup_pyramid(comp, config):
     config.add_view(
