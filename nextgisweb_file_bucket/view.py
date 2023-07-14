@@ -6,6 +6,7 @@ from nextgisweb.pyramid import viewargs
 
 from nextgisweb.resource import Resource, Widget, resource_factory, ResourceScope
 from nextgisweb.resource.view import resource_sections
+from nextgisweb.core.exception import ForbiddenError
 
 from .model import FileBucket, FileResource, FileBucketFile
 
