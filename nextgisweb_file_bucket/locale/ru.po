@@ -1,56 +1,35 @@
-#: amd/ngw-file-bucket/Widget.js:86 model.py:34 view.py:19 view.py:32
+#: model.py:28 nodepkg/resource-widget/Widget.js:87 view.py:19 view.py:32
 msgid "File bucket"
 msgstr "Набор файлов"
 
-#: view.py:23
-msgid "Export"
-msgstr "Экспорт"
+#: nodepkg/resource-widget/Store.js:75
+msgid "ZIP archive required"
+msgstr "Требуется ZIP-архив"
 
-#: amd/ngw-file-bucket/Widget.js:65
-msgid "File name"
-msgstr "Имя файла"
+#: nodepkg/resource-widget/Widget.js:41
+msgid "Add files"
+msgstr "Добавить файлы"
 
-#: amd/ngw-file-bucket/Widget.js:71 template/section.mako:7
-msgid "MIME type"
-msgstr "Тип MIME"
+#: nodepkg/resource-widget/Widget.js:50
+msgid "Import from ZIP archive"
+msgstr "Импортировать из ZIP-архива"
 
-#: amd/ngw-file-bucket/Widget.js:77
-msgid "Size"
-msgstr "Размер"
+#: nodepkg/resource-widget/Widget.js:61
+msgid "Files will be imported from:"
+msgstr "Файлы будут импортированы из:"
 
-#: amd/ngw-file-bucket/Widget.js:106
-msgid "Upload files"
-msgstr "Загрузить файлы"
-
-#: amd/ngw-file-bucket/Widget.js:122
-msgid "Action confirmation"
-msgstr "Подтверждение действия"
-
-#: amd/ngw-file-bucket/Widget.js:130
-msgid "This operation will overwrite all resource files. Continue?"
-msgstr "Эта операция перезапишет все файлы ресурса. Продолжить?"
-
-#: amd/ngw-file-bucket/Widget.js:138
-msgid "OK"
-msgstr "ОК"
-
-#: amd/ngw-file-bucket/Widget.js:146
-msgid "Cancel"
-msgstr "Отмена"
-
-#: amd/ngw-file-bucket/Widget.js:162
-msgid "Upload archive"
-msgstr "Загрузить архив"
-
-#: amd/ngw-file-bucket/Widget.js:212
-msgid "Delete"
-msgstr "Удалить"
-
-#: template/section.mako:6
+#: template/resource_section.mako:5
 msgid "Name"
 msgstr "Наименование"
 
-#: template/section.mako:8
+#: template/resource_section.mako:6
+msgid "MIME type"
+msgstr "Тип MIME"
+
+#: template/resource_section.mako:7
 msgid "Size, KB"
 msgstr "Размер, КБ"
 
+#: view.py:24
+msgid "Export"
+msgstr "Экспорт"

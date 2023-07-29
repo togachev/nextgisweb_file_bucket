@@ -11,7 +11,7 @@ from .model import FileBucket
 class Widget(Widget):
     resource = FileBucket
     operation = ('create', 'update')
-    amdmod = 'ngw-file-bucket/Widget'
+    amdmod = '@nextgisweb/file-bucket/resource-widget'
 
 
 class FileBucketMenu(DynItem):
