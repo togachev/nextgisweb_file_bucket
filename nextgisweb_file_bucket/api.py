@@ -40,13 +40,13 @@ def setup_pyramid(comp, config):
         file_download, route_name='resource.file_download', context=FileBucket)
     config.add_route(
         'file_bucket.file_download',
-        r'/api/resource/{id:\d+}/file_bucket/file/{name:.*}',
+        r'/api/resource/{id:uint}/file_bucket/file/{name:str}',
         factory=resource_factory
     ).add_view(file_download, context=FileBucket)
 
     config.add_view(export, route_name='resource.export', context=FileBucket)
     config.add_route(
         'file_bucket.export',
-        r'/api/resource/{id:\d+}/file_bucket/export',
+        r'/api/resource/{id:uint}/file_bucket/export',
         factory=resource_factory
     ).add_view(export, context=FileBucket)
