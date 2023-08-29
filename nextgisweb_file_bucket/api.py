@@ -1,7 +1,8 @@
 import zipstream
 from pyramid.httpexceptions import HTTPNotFound
-from pyramid.response import FileResponse, Response
+from pyramid.response import Response
 
+from nextgisweb.pyramid.tomb import UnsafeFileResponse
 from nextgisweb.resource import DataScope, resource_factory
 
 from .model import FileBucket, FileBucketFile
@@ -18,7 +19,7 @@ def file_download(resource, request):
     if fobj is None:
         raise HTTPNotFound()
 
-    return FileResponse(fobj.path, content_type=fobj.mime_type, request=request)
+    return UnsafeFileResponse(fobj.path, content_type=fobj.mime_type, request=request)
 
 
 def export(resource, request):
