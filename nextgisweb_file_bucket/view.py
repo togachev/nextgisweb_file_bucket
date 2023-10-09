@@ -1,4 +1,3 @@
-
 from nextgisweb.env import _, DBSession
 from nextgisweb.lib.dynmenu import DynItem, Label, Link
 
@@ -14,19 +13,20 @@ PERM_UPDATE = ResourceScope.update
 
 class Widget(Widget):
     resource = FileBucket
-    operation = ('create', 'update')
-    amdmod = '@nextgisweb/file-bucket/resource-widget'
+    operation = ("create", "update")
+    amdmod = "@nextgisweb/file-bucket/resource-widget"
 
 
 class FileBucketMenu(DynItem):
     def build(self, args):
-        yield Label('file_bucket', _('File bucket'))
+        yield Label("file_bucket", _("File bucket"))
 
         if isinstance(args.obj, FileBucket):
             if args.obj.has_export_permission(args.request.user):
                 yield Link(
-                    'file_bucket/export', _('Export'),
-                    lambda args: args.request.route_url('resource.export', id=args.obj.id),
+                    "file_bucket/export",
+                    _("Export"),
+                    lambda args: args.request.route_url("resource.export", id=args.obj.id),
                 )
 
 @viewargs(renderer='react')

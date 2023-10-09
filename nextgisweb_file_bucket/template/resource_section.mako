@@ -1,4 +1,7 @@
-<table class="pure-table pure-table-horizontal" style="width: 100%">
+<%page args="section" />
+<% section.content_box = False %>
+
+<table class="pure-table pure-table-horizontal ngw-card" style="width: 100%">
     <thead>
         <tr>
             <th style="width: 5%">#</th>

@@ -4,7 +4,6 @@ from nextgisweb.env import Component
 
 
 class FileBucketComponent(Component):
-
     def initialize(self):
         self.path = self.env.core.gtsdir(self)
 
@@ -13,6 +12,7 @@ class FileBucketComponent(Component):
 
     def setup_pyramid(self, config):
         from . import api, view  # NOQA
+
         api.setup_pyramid(self, config)
         view.setup_pyramid(self, config)
 
