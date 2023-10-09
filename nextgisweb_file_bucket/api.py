@@ -1,9 +1,10 @@
 import zipstream
 from pyramid.httpexceptions import HTTPNotFound
-from pyramid.response import FileResponse, Response
+from pyramid.response import Response
 
-from nextgisweb.pyramid import viewargs
+from nextgisweb.pyramid.tomb import UnsafeFileResponse
 from nextgisweb.resource import Resource, DataScope, resource_factory, DataStructureScope, ResourceScope
+from nextgisweb.pyramid import viewargs
 
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from nextgisweb.postgis.exception import ExternalDatabaseError
@@ -19,26 +20,23 @@ def file_download(resource, request):
     request.resource_permission(DataScope.read)
 
     fname = request.matchdict["name"]
-    fobj = FileBucketFile.filter_by(
-        file_bucket_id=resource.id,
-        name=fname
-    ).one_or_none()
+    fobj = FileBucketFile.filter_by(file_bucket_id=resource.id, name=fname).one_or_none()
     if fobj is None:
         raise HTTPNotFound()
 
-    return FileResponse(fobj.path, content_type=fobj.mime_type, request=request)
+    return UnsafeFileResponse(fobj.path, content_type=fobj.mime_type, request=request)
 
 
 def export(resource, request):
     request.resource_permission(DataScope.read)
 
-    zip_stream = zipstream.ZipFile(mode='w', compression=zipstream.ZIP_DEFLATED, allowZip64=True)
+    zip_stream = zipstream.ZipFile(mode="w", compression=zipstream.ZIP_DEFLATED, allowZip64=True)
     for f in resource.files:
         zip_stream.write(f.path, arcname=f.name)
 
     return Response(
         app_iter=zip_stream,
-        content_type='application/zip',
+        content_type="application/zip",
         content_disposition='attachment; filename="%d.zip"' % resource.id,
     )
 @viewargs(renderer='json')
@@ -79,6 +77,7 @@ def file_resource_show(resource, request):
             .join(FileBucketFile, FileResource.file_resource_id == FileBucketFile.id) \
             .join(Resource, FileBucketFile.file_bucket_id == Resource.id) \
             .filter(FileResource.id == resource.id)
+
         for fr, fbf, res in query:
             result.append(dict(
                 resource_id = fr.id,
@@ -89,7 +88,7 @@ def file_resource_show(resource, request):
                 name=fbf.name,
                 mime_type = fbf.mime_type,
                 size = fbf.size,
-                link = request.route_url('file_bucket.file_download', id=fbf.file_bucket_id, name=fbf.name),
+                link = request.route_url('resource.file_download', id=fbf.file_bucket_id, name=fbf.name),
                 res_name = res.display_name,
             ))
         status = len(result) > 0 if True else False
@@ -103,46 +102,51 @@ def file_resource_show(resource, request):
 
 def setup_pyramid(comp, config):
     config.add_view(
-        file_download, route_name='resource.file_download', context=FileBucket)
-    config.add_route(
-        'file_bucket.file_download',
-        r'/api/resource/{id:\d+}/file_bucket/file/{name:.*}',
-        factory=resource_factory
-    ).add_view(file_download, context=FileBucket)
+        file_download,
+        route_name="resource.file_download",
+        context=FileBucket,
+        request_method='GET',
+    )
 
-    config.add_view(export, route_name='resource.export', context=FileBucket)
+    config.add_view(
+        export,
+        route_name="resource.export",
+        context=FileBucket,
+        request_method='GET',
+    )
+
     config.add_route(
         'file_bucket.export',
-        r'/api/resource/{id:\d+}/file_bucket/export',
-        factory=resource_factory
-    ).add_view(export, context=FileBucket)
+        r'/api/resource/{id:uint}/file_bucket/export',
+        factory=resource_factory,
+        request_method="GET",
+        get=export,
+    )
 
     config.add_route(
         'file_resource.create',
-        r'/api/file-resource/{id:\d+}/create/{fid:\d+}/',
-        factory=resource_factory
-    ).add_view(
-        file_resource_create
+        r'/api/file-resource/{id:uint}/create/{fid:uint}/',
+        factory=resource_factory,
+        get=file_resource_create
     )
 
     config.add_route(
         'file_resource.delete',
-        r'/api/file-resource/{id:\d+}/delete/{fid:\d+}/',
-        factory=resource_factory
-    ).add_view(
-        file_resource_delete
+        r'/api/file-resource/{id:uint}/delete/{fid:uint}/',
+        factory=resource_factory,
+        get=file_resource_delete
     )
 
     config.add_route(
         'file_resource.delete_all',
-        r'/api/file-resource/{id:\d+}/delete_all',
-        factory=resource_factory
-    ).add_view(
-        file_resource_delete_all
+        r'/api/file-resource/{id:uint}/delete_all',
+        factory=resource_factory,
+        get=file_resource_delete_all
     )
 
     config.add_route(
         'file_resource.show',
-        r'/api/file-resource/{id:\d+}/show',
+        '/api/file-resource/{id:uint}/show',
         factory=resource_factory,
-    ).add_view(file_resource_show)
+        get=file_resource_show
+    )

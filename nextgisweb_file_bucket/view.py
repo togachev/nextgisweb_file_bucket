@@ -15,7 +15,7 @@ PERM_UPDATE = ResourceScope.update
 class Widget(Widget):
     resource = FileBucket
     operation = ('create', 'update')
-    amdmod = 'ngw-file-bucket/Widget'
+    amdmod = '@nextgisweb/file-bucket/resource-widget'
 
 
 class FileBucketMenu(DynItem):
@@ -55,7 +55,7 @@ def file_resource(resource, request):
                     id = fr.file_resource_id,
                 ))
             return dict(
-                entrypoint='@nextgisweb/file_bucket/file-resource',
+                entrypoint='@nextgisweb/file-bucket/file-resource',
                 props=dict(id=request.context.id, fileList=fileList, fileItem=fileItem),
                 obj=request.context,
                 title=_("Files"))
@@ -67,9 +67,8 @@ def file_resource(resource, request):
 def setup_pyramid(comp, config):
     config.add_route(
         'file_resource.settings',
-        r'/file-resource/{id:\d+}/settings',
+        r'/file-resource/{id:uint}/settings',
         factory=resource_factory,
-        client=('id',)
     ).add_view(file_resource)
 
     Resource.__dynmenu__.add(FileBucketMenu())

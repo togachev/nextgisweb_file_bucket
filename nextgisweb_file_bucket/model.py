@@ -15,10 +15,10 @@ from nextgisweb.file_storage import FileObj
 from nextgisweb.resource import (
     DataScope,
     DataStructureScope,
-    MetadataScope,
     Resource,
     ResourceScope,
     ResourceGroup,
+    ResourceScope,
     Serializer,
 )
 from nextgisweb.resource import SerializedProperty as SP
@@ -198,7 +198,7 @@ class FileBucketSerializer(Serializer):
         read=DataStructureScope.read,
         write=DataStructureScope.write)
 
-    tstamp = _tsamp_attr(read=MetadataScope.read, write=MetadataScope.write)
+    tstamp = _tsamp_attr(read=ResourceScope.read, write=ResourceScope.update)
 
     def deserialize(self):
         if 'files' in self.data and 'archive' in self.data:

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { errorModal } from "@nextgisweb/gui/error";
 import "./FileResource.less";
-import i18n from "@nextgisweb/pyramid/i18n";
+import { gettext } from "@nextgisweb/pyramid/i18n";
 import Select from 'react-select';
 import getSelectStyle from "@nextgisweb/resource/map_list/selectStyle";
 import makeAnimated from 'react-select/animated';
@@ -73,18 +73,18 @@ export function FileResource(props) {
     
     const columns = [
         {
-            title: i18n.gettext("Name"),
+            title: gettext("Name"),
             dataIndex: 'name',
             key: 'name',
             render: (name, item) => <a className="link-file" target="_blank" href={routeURL('resource.file_download', item.file_bucket_id, item.name)}>{item.name}</a>,
         },
         {
-            title: i18n.gettext("MIME type"),
+            title: gettext("MIME type"),
             dataIndex: 'mime_type',
             key: 'mime_type',
         },
         {
-            title: i18n.gettext("Size, KB"),
+            title: gettext("Size, KB"),
             dataIndex: 'size',
             key: 'size',
             render: (size) => {

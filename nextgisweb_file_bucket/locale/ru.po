@@ -1,63 +1,26 @@
-#: api.py:53
-msgid "ERROR: duplicate key violates unique constraint."
-msgstr ""
-
-#: amd/ngw-file-bucket/Widget.js:86 model.py:29 view.py:22 view.py:75
+#: model.py:28 nodepkg/resource-widget/Widget.js:87 view.py:19 view.py:32
 msgid "File bucket"
 msgstr "Набор файлов"
 
-#: model.py:70
-msgid "File resource"
-msgstr ""
+#: nodepkg/resource-widget/Store.js:75
+msgid "ZIP archive required"
+msgstr "Требуется ZIP-архив"
 
-#: view.py:27
-msgid "Export"
-msgstr "Экспорт"
+#: nodepkg/resource-widget/Widget.js:41
+msgid "Add files"
+msgstr "Добавить файлы"
 
-#: view.py:59
-msgid "Files"
-msgstr "Файлы"
+#: nodepkg/resource-widget/Widget.js:50
+msgid "Import from ZIP archive"
+msgstr "Импортировать из ZIP-архива"
 
-#: amd/ngw-file-bucket/Widget.js:65
-msgid "File name"
-msgstr "Имя файла"
+#: nodepkg/resource-widget/Widget.js:61
+msgid "Files will be imported from:"
+msgstr "Файлы будут импортированы из:"
 
-#: amd/ngw-file-bucket/Widget.js:71 nodepkg/file-resource/FileResource.js:82
-#: template/resource_section.mako:6
-msgid "MIME type"
-msgstr "Тип MIME"
-
-#: amd/ngw-file-bucket/Widget.js:77
-msgid "Size"
-msgstr "Размер"
-
-#: amd/ngw-file-bucket/Widget.js:106
-msgid "Upload files"
-msgstr "Загрузить файлы"
-
-#: amd/ngw-file-bucket/Widget.js:122
-msgid "Action confirmation"
-msgstr "Подтверждение действия"
-
-#: amd/ngw-file-bucket/Widget.js:130
-msgid "This operation will overwrite all resource files. Continue?"
-msgstr "Эта операция перезапишет все файлы ресурса. Продолжить?"
-
-#: amd/ngw-file-bucket/Widget.js:138
-msgid "OK"
-msgstr "ОК"
-
-#: amd/ngw-file-bucket/Widget.js:146
-msgid "Cancel"
-msgstr "Отмена"
-
-#: amd/ngw-file-bucket/Widget.js:162
-msgid "Upload archive"
-msgstr "Загрузить архив"
-
-#: amd/ngw-file-bucket/Widget.js:212
-msgid "Delete"
-msgstr "Удалить"
+#: template/resource_section.mako:5
+msgid "Name"
+msgstr "Наименование"
 
 #: nodepkg/file-resource/FileResource.js:76 template/resource_section.mako:5
 msgid "Name"
@@ -67,6 +30,10 @@ msgstr "Наименование"
 msgid "Size, KB"
 msgstr "Размер, КБ"
 
-#~ msgid "Nested File Editor"
-#~ msgstr "Редактор вложенных файлов"
+#: view.py:24
+msgid "Export"
+msgstr "Экспорт"
 
+#: view.py:59
+msgid "Files"
+msgstr "Файлы"

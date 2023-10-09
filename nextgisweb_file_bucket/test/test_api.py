@@ -1,7 +1,10 @@
 import zipfile
 from io import BytesIO
 
+import pytest
 import webtest
+
+pytestmark = pytest.mark.usefixtures("ngw_resource_defaults", "ngw_auth_administrator")
 
 TEST_FILE1 = {"name": "red/rose.flw", "content": "rose".encode("utf-8")}
 TEST_FILE2 = {"name": "orchid.flw", "content": "orchid".encode("utf-8")}
@@ -10,9 +13,8 @@ TEST_FILE3 = {"name": "white/daisy.flw", "content": "daisy".encode("utf-8")}
 
 def test_bucket_crud(ngw_webtest_app):
     webapp = ngw_webtest_app
-    webapp.authorization = ("Basic", ("administrator", "admin"))
 
-    resp = webapp.post("/api/component/file_upload/upload", [
+    resp = webapp.post("/api/component/file_upload/", [
         ["files[]", webtest.Upload(TEST_FILE1["name"], TEST_FILE1["content"])],
         ["files[]", webtest.Upload(TEST_FILE2["name"], TEST_FILE2["content"])],
         ["files[]", webtest.Upload(TEST_FILE3["name"], TEST_FILE3["content"])]
@@ -42,7 +44,7 @@ def test_bucket_crud(ngw_webtest_app):
     webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE1["name"]), status=200)
     webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE2["name"]), status=404)
 
-    resp = webapp.post("/api/component/file_upload/upload", {
+    resp = webapp.post("/api/component/file_upload/", {
         "file": webtest.Upload(TEST_FILE1["name"], TEST_FILE1["content"])
     })
     webapp.put_json("/api/resource/%d" % bucket_id, {
@@ -64,7 +66,7 @@ def test_archive(ngw_webtest_app):
                 archive.writestr(f["name"], f["content"])
         data.seek(0)
 
-        resp = webapp.put("/api/component/file_upload/upload", data.read())
+        resp = webapp.put("/api/component/file_upload/", data.read())
         return resp.json["id"]
 
     archive_id = make_archive([TEST_FILE1, TEST_FILE2])
@@ -93,7 +95,7 @@ def test_archive(ngw_webtest_app):
     webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE2["name"]), status=200)
     webapp.get("/api/resource/%d/file/%s" % (bucket_id, TEST_FILE3["name"]), status=200)
 
-    resp = webapp.get("/api/resource/%d/file_bucket/export" % bucket_id, status=200)
+    resp = webapp.get("/api/resource/%d/export" % bucket_id, status=200)
     with zipfile.ZipFile(BytesIO(resp.body), mode="r", compression=zipfile.ZIP_DEFLATED, allowZip64=False) as archive:
         assert archive.read(TEST_FILE2["name"]) == TEST_FILE2["content"]
         assert archive.read(TEST_FILE3["name"]) == TEST_FILE3["content"]
