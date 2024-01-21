@@ -4,11 +4,11 @@ import { errorModal } from "@nextgisweb/gui/error";
 import "./FileResource.less";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import Select from 'react-select';
-import getSelectStyle from "@nextgisweb/resource/map_list/selectStyle";
+import getSelectStyle from "./selectStyle";
 import makeAnimated from 'react-select/animated';
 import { Table } from "@nextgisweb/gui/antd";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
-import "@nextgisweb/resource/map_list/details.less";
+import "./details.less";
 
 const animatedComponents = makeAnimated();
 
