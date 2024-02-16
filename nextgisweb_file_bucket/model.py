@@ -126,9 +126,7 @@ class _files_attr(SP):
                 file_info = files_info.pop(filebucket_file.name)
                 if "id" in file_info:  # Updated file
                     fupload = FileUpload(id=file_info["id"])
-                    srcfile = fupload.data_path
-                    dstfile = filebucket_file.fileobj.filename()
-                    copyfile(srcfile, dstfile)
+                    filebucket_file.fileobj = fupload.to_fileobj()
                 else:  # Untouched file
                     pass
 
