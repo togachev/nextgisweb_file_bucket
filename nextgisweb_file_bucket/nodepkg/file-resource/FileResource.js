@@ -49,7 +49,7 @@ export function FileResource(props) {
         }
     }
 
-    const deleteItems = async (fid) => {
+    const deleteItems = async () => {
         try {
             await route("file_resource.delete_all", props.id).get();
         }
