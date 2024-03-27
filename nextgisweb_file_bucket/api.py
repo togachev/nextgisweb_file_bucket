@@ -8,7 +8,6 @@ from nextgisweb.pyramid import viewargs
 
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from nextgisweb.postgis.exception import ExternalDatabaseError
-from nextgisweb.resource.exception import ResourceError
 from nextgisweb.env import _, DBSession
 
 from .model import FileBucket, FileBucketFile, FileResource
