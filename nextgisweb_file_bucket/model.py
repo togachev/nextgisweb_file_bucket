@@ -2,16 +2,17 @@ import os
 import os.path
 import zipfile
 from datetime import datetime
-from shutil import copyfile, copyfileobj
+from shutil import copyfile
 
 import dateutil
 import magic
 
-from nextgisweb.env import Base, DBSession, _, env
+from nextgisweb.env import Base, DBSession, _
 from nextgisweb.lib import db
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
+from nextgisweb.file_upload import FileUpload
 from nextgisweb.resource import (
     DataScope,
     DataStructureScope,
@@ -62,7 +63,7 @@ class FileBucketFile(Base):
 
     @property
     def path(self):
-        return env.file_storage.filename(self.fileobj)
+        return self.fileobj.filename()
 
 class FileResource(Base):
     __tablename__ = 'file_resource'
@@ -86,7 +87,7 @@ class _archive_attr(SP):
     def setter(self, srlzr, value):
         srlzr.obj.tstamp = datetime.utcnow()
 
-        archive_name, metafile = env.file_upload.get_filename(value["id"])
+        fupload = FileUpload(id=value["id"])
 
         old_files = list(srlzr.obj.files)
 
@@ -96,7 +97,7 @@ class _archive_attr(SP):
 
         DBSession.flush()
 
-        with zipfile.ZipFile(archive_name, mode="r", allowZip64=True) as archive:
+        with zipfile.ZipFile(fupload.data_path, mode="r", allowZip64=True) as archive:
             for file_info in archive.infolist():
                 if file_info.is_dir():
                     continue
@@ -104,13 +105,10 @@ class _archive_attr(SP):
                 if not validate_filename(file_info.filename):
                     raise ValidationError(message="Insecure filename.")
 
-                fileobj = env.file_storage.fileobj(component="file_bucket")
-
-                dstfile = env.file_storage.filename(fileobj, makedirs=True)
-                with archive.open(file_info.filename, "r") as sf, open(dstfile, "w+b") as df:
-                    copyfileobj(sf, df)
-                    df.seek(0)
-                    mime_type = magic.from_buffer(df.read(1024), mime=True)
+                with archive.open(file_info, "r") as sf:
+                    mime_type = magic.from_buffer(sf.read(1024), mime=True)
+                    sf.seek(0)
+                    fileobj = FileObj().copy_from(sf)
 
                 filebucketfileobj = FileBucketFile(
                     name=file_info.filename,
@@ -143,9 +141,8 @@ class _files_attr(SP):
             else:
                 file_info = files_info.pop(filebucket_file.name)
                 if "id" in file_info:  # Updated file
-                    srcfile, metafile = env.file_upload.get_filename(file_info["id"])
-                    dstfile = env.file_storage.filename(filebucket_file.fileobj, makedirs=False)
-                    copyfile(srcfile, dstfile)
+                    fupload = FileUpload(id=file_info["id"])
+                    filebucket_file.fileobj = fupload.to_fileobj()
                 else:  # Untouched file
                     pass
 
@@ -153,11 +150,8 @@ class _files_attr(SP):
             srlzr.obj.files.remove(f)
 
         for name, file_info in files_info.items():  # New file
-            fileobj = env.file_storage.fileobj(component="file_bucket")
-
-            srcfile, metafile = env.file_upload.get_filename(file_info["id"])
-            dstfile = env.file_storage.filename(fileobj, makedirs=True)
-            copyfile(srcfile, dstfile)
+            fupload = FileUpload(id=file_info["id"])
+            fileobj = fupload.to_fileobj()
 
             filebucket_file = FileBucketFile(
                 name=name,
