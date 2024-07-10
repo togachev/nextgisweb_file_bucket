@@ -99,6 +99,39 @@ def file_resource_show(resource, request):
         result=result,
         status=status)
 
+@viewargs(renderer='json')
+def file_resource_all(request):
+    result = list()
+    try:
+        query = DBSession.query(Resource, FileResource, FileBucketFile) \
+            .join(FileResource, FileResource.id == Resource.id) \
+            .join(FileBucketFile, FileBucketFile.id == FileResource.file_resource_id) \
+            .filter(FileResource.id == Resource.id)
+
+        for resource, file_resource, file_bucket_file in query:
+            if resource.has_permission(PERM_READ, request.user):
+                result.append(dict(
+                    key = str(resource.id) + ":" + str(file_resource.file_resource_id),
+                    resource_id = resource.id,
+                    resource_name = resource.display_name,
+                    cls = resource.cls,
+                    file_resource_id = file_resource.file_resource_id,
+                    file_bucket_id = file_bucket_file.file_bucket_id,
+                    fileobj_id = file_bucket_file.fileobj_id,
+                    name=file_bucket_file.name,
+                    mime_type = file_bucket_file.mime_type,
+                    size = file_bucket_file.size,
+                    link = request.route_url('resource.file_download', id=file_bucket_file.file_bucket_id, name=file_bucket_file.name),
+                ))
+        status = len(result) > 0 if True else False
+    except KeyError:
+        result=None
+        status=False
+
+    return dict(
+        result=result,
+        status=status)
+
 def setup_pyramid(comp, config):
     config.add_view(
         file_download,
@@ -148,4 +181,10 @@ def setup_pyramid(comp, config):
         '/api/file-resource/{id:uint}/show',
         factory=resource_factory,
         get=file_resource_show
+    )
+
+    config.add_route(
+        'file_resource.all',
+        '/api/file-resource/all',
+        get=file_resource_all
     )
