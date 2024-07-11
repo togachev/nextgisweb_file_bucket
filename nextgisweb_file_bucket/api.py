@@ -78,18 +78,19 @@ def file_resource_show(resource, request):
             .filter(FileResource.id == resource.id)
 
         for fr, fbf, res in query:
-            result.append(dict(
-                resource_id = fr.id,
-                file_resource_id = fr.file_resource_id,
-                id = fbf.id,
-                file_bucket_id = fbf.file_bucket_id,
-                fileobj_id = fbf.fileobj_id,
-                name=fbf.name,
-                mime_type = fbf.mime_type,
-                size = fbf.size,
-                link = request.route_url('resource.file_download', id=fbf.file_bucket_id, name=fbf.name),
-                res_name = res.display_name,
-            ))
+            if res.has_permission(PERM_READ, request.user):
+                result.append(dict(
+                    resource_id = fr.id,
+                    file_resource_id = fr.file_resource_id,
+                    id = fbf.id,
+                    file_bucket_id = fbf.file_bucket_id,
+                    fileobj_id = fbf.fileobj_id,
+                    name=fbf.name,
+                    mime_type = fbf.mime_type,
+                    size = fbf.size,
+                    link = request.route_url('resource.file_download', id=fbf.file_bucket_id, name=fbf.name),
+                    res_name = res.display_name,
+                ))
         status = len(result) > 0 if True else False
     except KeyError:
         result=None
