@@ -3,7 +3,7 @@ import { makeAutoObservable } from "mobx";
 export type SetValue<T> = ((prevValue: T) => T) | T;
 
 export class ResourceFileStore {
-    id: number | null = null;
+    id: number;
     sourceGroup = false; 
     listMaps: string[] = []; 
 

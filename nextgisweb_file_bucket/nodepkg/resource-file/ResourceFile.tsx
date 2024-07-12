@@ -10,29 +10,27 @@ import { ResourceFileStore } from "./ResourceFileStore";
 import "./ResourceFile.less";
 import { useSource } from "./hook/useSource";
 
-export const ResourceFile = observer(({ id }) => {
+export const ResourceFile = observer(({ styleId }) => {
     const [store] = useState(() => new ResourceFileStore({
-        id: id,
+        id: styleId,
     }));
-    console.log(id);
+    console.log(styleId);
     
     const { ListFile, ListResourceFile, createItem, deleteItem, deleteItems } = useSource();
 
     useEffect(() => {
-        store.setId(id);
-        ListResourceFile(store.id)
+        ListResourceFile(styleId)
             .then(item => {
                 console.log(item);
             })
     }, []);
 
     useEffect(() => {
-        store.setId(id);
-        ListResourceFile(store.id)
+        ListResourceFile(styleId)
             .then(item => {
                 console.log(item);
             })
-    }, [id]);
+    }, [styleId]);
 
     return (
         <>
