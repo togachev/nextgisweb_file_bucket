@@ -10,6 +10,8 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from nextgisweb.postgis.exception import ExternalDatabaseError
 from nextgisweb.env import _, DBSession
 
+from nextgisweb.core.exception import ForbiddenError, InsufficientPermissions
+
 from .model import FileBucket, FileBucketFile, FileResource
 
 PERM_UPDATE = ResourceScope.update
@@ -101,37 +103,57 @@ def file_resource_show(resource, request):
         status=status)
 
 @viewargs(renderer='json')
-def file_resource_all(request):
+def files(request):
     result = list()
-    try:
-        query = DBSession.query(Resource, FileResource, FileBucketFile) \
-            .join(FileResource, FileResource.id == Resource.id) \
-            .join(FileBucketFile, FileBucketFile.id == FileResource.file_resource_id) \
-            .filter(FileResource.id == Resource.id)
+    query = DBSession.query(FileBucketFile, FileBucket) \
+        .join(FileBucketFile, FileBucket.id == FileBucketFile.file_bucket_id)
 
-        for resource, file_resource, file_bucket_file in query:
-            if resource.has_permission(PERM_READ, request.user):
-                result.append(dict(
-                    key = str(resource.id) + ":" + str(file_resource.file_resource_id),
-                    resource_id = resource.id,
-                    resource_name = resource.display_name,
-                    cls = resource.cls,
-                    file_resource_id = file_resource.file_resource_id,
-                    file_bucket_id = file_bucket_file.file_bucket_id,
-                    fileobj_id = file_bucket_file.fileobj_id,
-                    name=file_bucket_file.name,
-                    mime_type = file_bucket_file.mime_type,
-                    size = file_bucket_file.size,
-                    link = request.route_url('resource.file_download', id=file_bucket_file.file_bucket_id, name=file_bucket_file.name),
+    for fbf, fb in query:
+        if fb.has_permission(PERM_READ, request.user):
+            result.append(dict(
+                file_bucket_id = fbf.file_bucket_id,
+                fileobj_id = fbf.fileobj_id,
+                name=fbf.name,
+                mime_type = fbf.mime_type,
+                size = fbf.size,
+                link = request.route_url('resource.file_download', id=fbf.file_bucket_id, name=fbf.name),
+                file_bucket_name = fb.display_name,
+            ))
+
+    return result
+
+@viewargs(renderer='json')
+def file_resource(resource, request):
+    if resource.cls in ['mapserver_style', 'qgis_vector_style', 'qgis_raster_style', 'wmsclient_layer', 'tmsclient_layer']:
+        if resource.has_permission(PERM_UPDATE, request.user):
+            fileList = list() # список всех файлов
+            fileItem = list() # список файлов ресурса
+
+            query = DBSession.query(FileBucketFile, Resource) \
+                .join(Resource, FileBucketFile.file_bucket_id == Resource.id)
+            for fbf, res in query:
+                fileList.append(dict(
+                    id = fbf.id,
+                    file_bucket_id = fbf.file_bucket_id,
+                    fileobj_id = fbf.fileobj_id,
+                    name=fbf.name,
+                    mime_type = fbf.mime_type,
+                    size = fbf.size,
+                    res_name = res.display_name,
                 ))
-        status = len(result) > 0 if True else False
-    except KeyError:
-        result=None
-        status=False
 
-    return dict(
-        result=result,
-        status=status)
+            fres = DBSession.query(FileResource).filter(FileResource.id == request.context.id)
+            for fr in fres:
+                fileItem.append(dict(
+                    id = fr.file_resource_id,
+                ))
+            return dict(
+                props=dict(id=request.context.id, fileList=fileList, fileItem=fileItem)
+            )
+        else:
+            raise InsufficientPermissions()
+    else:
+        raise ForbiddenError()
 
 def setup_pyramid(comp, config):
     config.add_view(
@@ -146,6 +168,13 @@ def setup_pyramid(comp, config):
         route_name="resource.export",
         context=FileBucket,
         request_method='GET',
+    )
+
+    config.add_route(
+        'file_resource.data',
+        r'/file-resource/{id:uint}/data',
+        factory=resource_factory,
+        get=file_resource
     )
 
     config.add_route(
@@ -187,5 +216,5 @@ def setup_pyramid(comp, config):
     config.add_route(
         'file_resource.all',
         '/api/file-resource/all',
-        get=file_resource_all
+        get=files
     )

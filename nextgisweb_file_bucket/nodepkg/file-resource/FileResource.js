@@ -120,7 +120,7 @@ export function FileResource(props) {
     };
 
     var itemsGroup = groupBy(finalArray, 'res_name');
-
+    console.log(itemsGroup);
     const [isOpen, setIsOpen] = useState('');
     
     useEffect(async () => {

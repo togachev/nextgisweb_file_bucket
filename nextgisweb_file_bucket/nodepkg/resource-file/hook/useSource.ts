@@ -3,14 +3,19 @@ import { errorModal } from "@nextgisweb/gui/error";
 
 export const useSource = () => {
 
-    const ListFile = async () => {
-        const listFile = await route("file_resource.all").get(); // список всех файлов
-        return listFile;
+    const ResourceFile = async (id) => {
+        const resourceFile = await route("file_resource.data", id).get(); // список всех файлов
+        return resourceFile;
     }
 
-    const ListResourceFile = async (id) => {
-        const listResource = await route("file_resource.show", id).get(); // список файлов ресурса
-        return listResource;
+    const listFile = async () => {
+        const value = await route("file_resource.all").get(); // список всех файлов
+        return value;
+    }
+
+    const listResourceFile = async (id) => {
+        const value = await route("file_resource.show", id).get(); // список файлов ресурса
+        return value;
     }
 
     const createItem = async (id, fid) => {
@@ -40,5 +45,5 @@ export const useSource = () => {
     }
 
 
-    return { ListFile, ListResourceFile, createItem, deleteItem, deleteItems };
+    return { createItem, listFile, listResourceFile, deleteItem, deleteItems, ResourceFile };
 };

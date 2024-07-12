@@ -4,8 +4,10 @@ export type SetValue<T> = ((prevValue: T) => T) | T;
 
 export class ResourceFileStore {
     id: number;
-    sourceGroup = false; 
-    listMaps: string[] = []; 
+    resourceFileGroup = false; 
+    resourceFile: string[] = []; 
+    defaultItems: string[] = []; 
+    isOpen = false;
 
     constructor({ id, ...props }) {
         this.id = id
@@ -20,16 +22,24 @@ export class ResourceFileStore {
         makeAutoObservable(this, {});
     }
 
-    setId = (id: number) => {
+    setData = (id: number) => {
         this.id = id;
     };
 
-    setSourceGroup = (sourceGroup: boolean) => {
-        this.sourceGroup = sourceGroup;
+    setResourceFileGroup = (resourceFileGroup: boolean) => {
+        this.resourceFileGroup = resourceFileGroup;
     };
 
-    setListMaps = (listMaps: SetValue<string>) => {
-        this.setValue("listMaps", listMaps);
+    setResourceFile = (resourceFile: SetValue<string>) => {
+        this.setValue("resourceFile", resourceFile);
+    };
+
+    setDefaultItems = (defaultItems: SetValue<string>) => {
+        this.setValue("defaultItems", defaultItems);
+    };
+
+    setIsOpen = (isOpen: boolean) => {
+        this.isOpen = isOpen;
     };
 
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
