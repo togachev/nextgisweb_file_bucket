@@ -73,34 +73,32 @@ def file_resource_delete_all(request):
 def file_resource_show(resource, request):
     request.resource_permission(PERM_READ)
     result = list()
-    try:
-        query = DBSession.query(FileResource, FileBucketFile, Resource) \
-            .join(FileBucketFile, FileResource.file_resource_id == FileBucketFile.id) \
-            .join(Resource, FileBucketFile.file_bucket_id == Resource.id) \
-            .filter(FileResource.id == resource.id)
+    group = list()
+    query = DBSession.query(FileResource, FileBucketFile, Resource) \
+        .join(FileBucketFile, FileResource.file_resource_id == FileBucketFile.id) \
+        .join(Resource, FileBucketFile.file_bucket_id == Resource.id) \
+        .filter(FileResource.id == resource.id)
 
-        for fr, fbf, res in query:
-            if res.has_permission(PERM_READ, request.user):
-                result.append(dict(
-                    resource_id = fr.id,
-                    file_resource_id = fr.file_resource_id,
-                    id = fbf.id,
-                    file_bucket_id = fbf.file_bucket_id,
-                    fileobj_id = fbf.fileobj_id,
-                    name=fbf.name,
-                    mime_type = fbf.mime_type,
-                    size = fbf.size,
-                    link = request.route_url('resource.file_download', id=fbf.file_bucket_id, name=fbf.name),
-                    res_name = res.display_name,
-                ))
-        status = len(result) > 0 if True else False
-    except KeyError:
-        result=None
-        status=False
+    for fr, fbf, res in query:
+        if res.has_permission(PERM_READ, request.user):
+            result.append(dict(
+                resource_id = fr.id,
+                file_resource_id = fr.file_resource_id,
+                id = fbf.id,
+                file_bucket_id = fbf.file_bucket_id,
+                fileobj_id = fbf.fileobj_id,
+                name=fbf.name,
+                mime_type = fbf.mime_type,
+                size = fbf.size,
+                link = request.route_url('resource.file_download', id=fbf.file_bucket_id, name=fbf.name),
+                res_name = res.display_name,
+            ))
+    for i, item in enumerate(result):
+        if item["res_name"] not in group:
+            group.append(i)
 
-    return dict(
-        result=result,
-        status=status)
+
+    return dict(result=result, group=group)
 
 @viewargs(renderer='json')
 def files(request):

@@ -3,14 +3,13 @@ import { makeAutoObservable } from "mobx";
 export type SetValue<T> = ((prevValue: T) => T) | T;
 
 export class ResourceFileStore {
-    id: number;
-    resourceFileGroup = false; 
-    resourceFile: string[] = []; 
-    defaultItems: string[] = []; 
-    isOpen = false;
+    defaultItems: string[] = [];
+    defaultArray: number[] = [];
+    isOpen = true;
+    visibleFile: boolean;
 
-    constructor({ id, ...props }) {
-        this.id = id
+    constructor({ visibleFile, ...props }) {
+        this.visibleFile = visibleFile;
         for (const key in props) {
             const k = key;
             const prop = (props)[k];
@@ -22,24 +21,20 @@ export class ResourceFileStore {
         makeAutoObservable(this, {});
     }
 
-    setData = (id: number) => {
-        this.id = id;
-    };
-
-    setResourceFileGroup = (resourceFileGroup: boolean) => {
-        this.resourceFileGroup = resourceFileGroup;
-    };
-
-    setResourceFile = (resourceFile: SetValue<string>) => {
-        this.setValue("resourceFile", resourceFile);
-    };
-
-    setDefaultItems = (defaultItems: SetValue<string>) => {
+    setDefaultItems = (defaultItems: SetValue<string[]>) => {
         this.setValue("defaultItems", defaultItems);
+    };
+
+    setDefaultArray = (defaultArray: number[]) => {
+        this.defaultArray = defaultArray;
     };
 
     setIsOpen = (isOpen: boolean) => {
         this.isOpen = isOpen;
+    };
+
+    setVisibleFile = (visibleFile: boolean) => {
+        this.visibleFile = visibleFile;
     };
 
     private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
