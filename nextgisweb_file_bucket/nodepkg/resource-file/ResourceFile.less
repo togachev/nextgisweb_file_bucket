@@ -1,4 +1,6 @@
 .resource-file-component {
+	margin: 5px 0 0 0;
+
 	.file-visible {
 		display: flex;
 		width: 100%;
@@ -39,6 +41,7 @@
 	.collapse-content {
 		border-radius: 0;
 		margin: 5px 0 0 0;
+		background-color: rgba(0, 0, 0, 0);
 
 		.table-content {
 			border-radius: 0 !important;
@@ -48,18 +51,23 @@
 		.table,
 		.tr,
 		.td {
-			border-radius: 3px !important;
+			border-radius: 0 !important;
 		}
-		.ant-table,
-		.table,
-		.tr,
-		.td {
-			border: 1px solid var(--divider-color);
-		}
+
+		// .ant-table,
+		// .table,
+		// .tr,
+		// .td {
+		// 	border: 1px solid var(--divider-color);
+		// }
 
 
 		.ant-table-wrapper .ant-table-container {
-			border-radius: 3px !important;
+			border-radius: 0 !important;
+		}
+
+		.ant-table-wrapper .ant-table-container table>thead>tr:first-child>*:last-child {
+			border-radius: 0 !important;
 		}
 
 		.ant-collapse {
@@ -74,7 +82,7 @@
 			background-color: #106a90;
 			border: 1px solid #d9d9d9;
 			border-bottom: 0;
-			border-radius: 3px;
+			border-radius: 0;
 		}
 
 		.ant-collapse-item {
@@ -94,16 +102,16 @@
 
 		.ant-collapse-header {
 			padding: 2px 0;
-			margin: 5px 0;
+			margin: 7px 0;
 			padding-inline-start: 0;
 			display: flex;
 			align-items: center;
 			border-radius: 3px !important;
-			border: 1px solid var(--divider-color);
+			background: var(--divider-color);
 
 			&:hover {
 				color: var(--primary);
-				background-color: var(--divider-color);
+				background-color: #d9d9d9;
 			}
 		}
 	}

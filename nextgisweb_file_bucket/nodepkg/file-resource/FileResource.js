@@ -76,7 +76,7 @@ export function FileResource(props) {
             title: gettext("Name"),
             dataIndex: 'name',
             key: 'name',
-            render: (name, item) => <a className="link-file" target="_blank" href={routeURL('resource.file_download', item.file_bucket_id, item.name)}>{item.name}</a>,
+            render: (name, item) => <a className="link-file" target="_blank" href={routeURL('resource.file_download', item.file_bucket_id, item.name)} download>{item.name}</a>,
         },
         {
             title: gettext("MIME type"),
