@@ -4,17 +4,17 @@ import { errorModal } from "@nextgisweb/gui/error";
 export const useSource = () => {
 
     const ResourceFile = async (id) => {
-        const resourceFile = await route("file_resource.data", id).get(); // список всех файлов
+        const resourceFile = await route("file_resource.data", id).get();
         return resourceFile;
     }
 
     const listFile = async () => {
-        const value = await route("file_resource.all").get(); // список всех файлов
+        const value = await route("file_resource.all").get();
         return value;
     }
 
     const listResourceFile = async (id) => {
-        const value = await route("file_resource.show", id).get(); // список файлов ресурса
+        const value = await route("file_resource.show", id).get();
         return value;
     }
 
