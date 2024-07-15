@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { routeURL } from "@nextgisweb/pyramid/api";
 import { Checkbox, Collapse, ConfigProvider, Table } from "@nextgisweb/gui/antd";
 import type { CheckboxProps, CollapseProps } from "@nextgisweb/gui/antd";
@@ -20,8 +20,7 @@ export const ResourceFile = observer(({ visibleFile, id, onValueChecked }) => {
         store.setVisibleFile(visibleFile);
         listResourceFile(id)
             .then(items => {
-                store.setDefaultItems(items.result);
-                store.setDefaultArray(items.group);
+                store.setDefaultItems(items);
             })
     }, [id])
 
@@ -47,29 +46,17 @@ export const ResourceFile = observer(({ visibleFile, id, onValueChecked }) => {
         },
     ];
 
-    const finalArray = store.defaultItems.map(obj => Object.assign(obj, { key: obj.id }))
-
-    var groupBy = (items, key) => {
-        return items.reduce((result, item) => {
-            if (item[key] !== "default value from resources") {
-                (result[item[key]] = result[item[key]] || []).push(item);
-            }
-            return result;
-        }, {});
-    };
-
-    var itemsGroup = groupBy(finalArray, "res_name");
-
     const onChange: CheckboxProps["onChange"] = (e) => {
         onValueChecked(e.target.checked);
         store.setVisibleFile(e.target.checked);
     };
 
-    const itemsFileList: CollapseProps["items"] = [];
     const onChangeCollapse = (key: string | string[]) => {
         console.log(key);
     };
-    const genExtra = (items) => (
+
+    const genExtra = (id) => {
+        return (
         <span
             className="icon-file-resource"
             onClick={(event) => {
@@ -77,29 +64,13 @@ export const ResourceFile = observer(({ visibleFile, id, onValueChecked }) => {
             }}>
             <SvgIconLink
                 title={gettext("Info")}
-                href={routeURL("resource.show", items[0].file_bucket_id)}
+                href={routeURL("resource.show", id)}
                 icon="material-info"
                 target="_blank"
                 fill="currentColor"
             />
         </span>
-    );
-
-    Object.keys(itemsGroup).map((key, index) => {
-        const items = itemsGroup[key];
-        itemsFileList.push({
-            key: index,
-            label: key,
-            children: <Table
-                className="table-content"
-                bordered
-                pagination={false}
-                columns={columns}
-                dataSource={items}
-            />,
-            extra: genExtra(items),
-        });
-    })
+    )};
 
     const VisibleFiles = gettext("Show/hide layer files");
     const EditLayerFiles = gettext("Edit layer files");
@@ -131,17 +102,39 @@ export const ResourceFile = observer(({ visibleFile, id, onValueChecked }) => {
                         </SvgIconLink>
                     </span>)}
                 </div>
-                {store.visibleFile && store.defaultArray.length > 0 && (
-                    <Collapse
-                        className="collapse-content"
-                        size="small"
-                        bordered={false}
-                        defaultActiveKey={store.isOpen ? store.defaultArray : undefined}
-                        onChange={onChangeCollapse}
-                        // expandIconPosition={expandIconPosition}
-                        items={itemsFileList}
-                    />
-                )}
+                {store.visibleFile && Object.entries(store.defaultItems).map((item, index) => {
+                    const label = item[0];
+                    const data = item[1];
+                    const id = data[0].file_bucket_id;
+                    const itemsFileList: CollapseProps["items"] = [];
+                    const defaultActiveKey: number[] = [];
+                    defaultActiveKey.push(index)
+                    itemsFileList.push({
+                        key: index,
+                        label: label,
+                        children: <Table
+                            className="table-content"
+                            bordered
+                            pagination={false}
+                            columns={columns}
+                            dataSource={data}
+                        />,
+                        extra: genExtra(id),
+                    })
+
+                    return (
+                        <Collapse
+                            key={index}
+                            className="collapse-content"
+                            size="small"
+                            bordered={false}
+                            defaultActiveKey={store.isOpen ? defaultActiveKey : undefined}
+                            onChange={onChangeCollapse}
+                            // expandIconPosition={expandIconPosition}
+                            items={itemsFileList}
+                        />
+                    )
+                })}
             </ConfigProvider >
         </div>
     )

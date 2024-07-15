@@ -1,4 +1,6 @@
 import zipstream
+from itertools import groupby
+from operator import itemgetter
 from pyramid.httpexceptions import HTTPNotFound
 from pyramid.response import Response
 
@@ -70,21 +72,20 @@ def file_resource_delete_all(request):
     return None
 
 @viewargs(renderer='json')
-def file_resource_show(resource, request):
-    request.resource_permission(PERM_READ)
+def file_resource_group_show(resource, request):
     result = list()
-    group = list()
     query = DBSession.query(FileResource, FileBucketFile, Resource) \
         .join(FileBucketFile, FileResource.file_resource_id == FileBucketFile.id) \
         .join(Resource, FileBucketFile.file_bucket_id == Resource.id) \
         .filter(FileResource.id == resource.id)
-
+    
     for fr, fbf, res in query:
         if res.has_permission(PERM_READ, request.user):
             result.append(dict(
                 resource_id = fr.id,
                 file_resource_id = fr.file_resource_id,
                 id = fbf.id,
+                key = fbf.id,
                 file_bucket_id = fbf.file_bucket_id,
                 fileobj_id = fbf.fileobj_id,
                 name=fbf.name,
@@ -93,12 +94,38 @@ def file_resource_show(resource, request):
                 link = request.route_url('resource.file_download', id=fbf.file_bucket_id, name=fbf.name),
                 res_name = res.display_name,
             ))
-    for i, item in enumerate(result):
-        if item["res_name"] not in group:
-            group.append(i)
 
+    res = dict()
+    for item in result:
+        res[item["res_name"]] = res.get(item["res_name"], [])
+        res[item["res_name"]].append(item)
 
-    return dict(result=result, group=group)
+    return res
+
+@viewargs(renderer='json')
+def file_resource_show(resource, request):
+    result = list()
+    query = DBSession.query(FileResource, FileBucketFile, Resource) \
+        .join(FileBucketFile, FileResource.file_resource_id == FileBucketFile.id) \
+        .join(Resource, FileBucketFile.file_bucket_id == Resource.id) \
+        .filter(FileResource.id == resource.id)
+    
+    for fr, fbf, res in query:
+        if res.has_permission(PERM_READ, request.user):
+            result.append(dict(
+                resource_id = fr.id,
+                file_resource_id = fr.file_resource_id,
+                id = fbf.id,
+                key = fbf.id,
+                file_bucket_id = fbf.file_bucket_id,
+                fileobj_id = fbf.fileobj_id,
+                name=fbf.name,
+                mime_type = fbf.mime_type,
+                size = fbf.size,
+                link = request.route_url('resource.file_download', id=fbf.file_bucket_id, name=fbf.name),
+                res_name = res.display_name,
+            ))
+    return result
 
 @viewargs(renderer='json')
 def files(request):
@@ -209,6 +236,13 @@ def setup_pyramid(comp, config):
         '/api/file-resource/{id:uint}/show',
         factory=resource_factory,
         get=file_resource_show
+    )
+
+    config.add_route(
+        'file_resource.group_show',
+        '/api/file-resource/{id:uint}/group_show',
+        factory=resource_factory,
+        get=file_resource_group_show
     )
 
     config.add_route(

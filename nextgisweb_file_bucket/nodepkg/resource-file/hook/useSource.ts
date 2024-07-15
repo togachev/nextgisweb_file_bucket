@@ -14,7 +14,7 @@ export const useSource = () => {
     }
 
     const listResourceFile = async (id) => {
-        const value = await route("file_resource.show", id).get();
+        const value = await route("file_resource.group_show", id).get();
         return value;
     }
 
