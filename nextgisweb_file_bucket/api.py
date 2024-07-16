@@ -103,31 +103,6 @@ def file_resource_group_show(resource, request):
     return res
 
 @viewargs(renderer='json')
-def file_resource_show(resource, request):
-    result = list()
-    query = DBSession.query(FileResource, FileBucketFile, Resource) \
-        .join(FileBucketFile, FileResource.file_resource_id == FileBucketFile.id) \
-        .join(Resource, FileBucketFile.file_bucket_id == Resource.id) \
-        .filter(FileResource.id == resource.id)
-    
-    for fr, fbf, res in query:
-        if res.has_permission(PERM_READ, request.user):
-            result.append(dict(
-                resource_id = fr.id,
-                file_resource_id = fr.file_resource_id,
-                id = fbf.id,
-                key = fbf.id,
-                file_bucket_id = fbf.file_bucket_id,
-                fileobj_id = fbf.fileobj_id,
-                name=fbf.name,
-                mime_type = fbf.mime_type,
-                size = fbf.size,
-                link = request.route_url('resource.file_download', id=fbf.file_bucket_id, name=fbf.name),
-                res_name = res.display_name,
-            ))
-    return result
-
-@viewargs(renderer='json')
 def files(request):
     result = list()
     query = DBSession.query(FileBucketFile, FileBucket) \
@@ -229,13 +204,6 @@ def setup_pyramid(comp, config):
         r'/api/file-resource/{id:uint}/delete_all',
         factory=resource_factory,
         get=file_resource_delete_all
-    )
-
-    config.add_route(
-        'file_resource.show',
-        '/api/file-resource/{id:uint}/show',
-        factory=resource_factory,
-        get=file_resource_show
     )
 
     config.add_route(
