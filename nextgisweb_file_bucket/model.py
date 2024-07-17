@@ -7,7 +7,7 @@ from shutil import copyfile
 import dateutil
 import magic
 
-from nextgisweb.env import Base, DBSession, _
+from nextgisweb.env import Base, DBSession, gettext
 from nextgisweb.lib import db
 
 from nextgisweb.core.exception import ValidationError
@@ -26,7 +26,7 @@ from nextgisweb.resource import SerializedProperty as SP
 
 class FileBucket(Base, Resource):
     identity = "file_bucket"
-    cls_display_name = _("File bucket")
+    cls_display_name = gettext("File bucket")
 
     __scope__ = (DataStructureScope, DataScope)
 

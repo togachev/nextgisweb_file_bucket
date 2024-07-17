@@ -1,4 +1,4 @@
-from nextgisweb.env import _
+from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import DynItem, Label, Link
 
 from nextgisweb.resource import Resource, Widget
@@ -15,13 +15,13 @@ class Widget(Widget):
 
 class FileBucketMenu(DynItem):
     def build(self, args):
-        yield Label("file_bucket", _("File bucket"))
+        yield Label("file_bucket", gettext("File bucket"))
 
         if isinstance(args.obj, FileBucket):
             if args.obj.has_export_permission(args.request.user):
                 yield Link(
                     "file_bucket/export",
-                    _("Export"),
+                    gettext("Export"),
                     lambda args: args.request.route_url("resource.export", id=args.obj.id),
                 )
 
@@ -29,6 +29,6 @@ class FileBucketMenu(DynItem):
 def setup_pyramid(comp, config):
     Resource.__dynmenu__.add(FileBucketMenu())
 
-    @resource_sections(title=_("File bucket"), priority=20)
+    @resource_sections(title=gettext("File bucket"), priority=20)
     def resource_section(obj):
         return isinstance(obj, FileBucket)
