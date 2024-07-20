@@ -2,7 +2,6 @@ import os
 import os.path
 import zipfile
 from datetime import datetime
-from shutil import copyfile
 
 import dateutil
 import magic
@@ -167,10 +166,8 @@ class FileBucketSerializer(Serializer):
     identity = FileBucket.identity
     resclass = FileBucket
 
-    archive = _archive_attr(read=None, write=DataStructureScope.write)
-
-    files = _files_attr(read=DataStructureScope.read, write=DataStructureScope.write)
-
+    archive = _archive_attr(read=None, write=ResourceScope.update)
+    files = _files_attr(read=DataScope.read, write=DataScope.write)
     tstamp = _tsamp_attr(read=ResourceScope.read, write=ResourceScope.update)
 
     def deserialize(self):
