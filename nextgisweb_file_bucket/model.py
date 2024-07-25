@@ -12,14 +12,7 @@ from nextgisweb.lib import db
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUpload
-from nextgisweb.resource import (
-    DataScope,
-    DataStructureScope,
-    Resource,
-    ResourceGroup,
-    ResourceScope,
-    Serializer,
-)
+from nextgisweb.resource import DataScope, Resource, ResourceGroup, ResourceScope, Serializer
 from nextgisweb.resource import SerializedProperty as SP
 
 
@@ -27,7 +20,7 @@ class FileBucket(Base, Resource):
     identity = "file_bucket"
     cls_display_name = gettext("File bucket")
 
-    __scope__ = (DataStructureScope, DataScope)
+    __scope__ = DataScope
 
     tstamp = db.Column(db.DateTime())
 
