@@ -14,11 +14,13 @@ from nextgisweb.file_storage import FileObj
 from nextgisweb.file_upload import FileUpload
 from nextgisweb.resource import DataScope, Resource, ResourceGroup, ResourceScope, Serializer
 from nextgisweb.resource import SerializedProperty as SP
+from nextgisweb.resource.category import MiscellaneousCategory
 
 
 class FileBucket(Base, Resource):
     identity = "file_bucket"
     cls_display_name = gettext("File bucket")
+    cls_category = MiscellaneousCategory
 
     __scope__ = DataScope
 
