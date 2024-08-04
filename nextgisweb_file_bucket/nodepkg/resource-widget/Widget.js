@@ -71,7 +71,7 @@ export const Widget = observer(({ store }) => {
                 </div>
             ) : (
                 <>
-                    <ActionToolbar actions={actions} />
+                    <ActionToolbar pad borderBlockEnd actions={actions} />
                     <EdiTable
                         {...{ store, columns }}
                         rowKey="id"
@@ -84,5 +84,6 @@ export const Widget = observer(({ store }) => {
     );
 });
 
+Widget.displayName = "Widget";
 Widget.title = gettext("File bucket");
 Widget.activateOn = { update: true };
