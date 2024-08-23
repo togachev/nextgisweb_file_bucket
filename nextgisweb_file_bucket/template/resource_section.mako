@@ -5,9 +5,9 @@
     <thead>
         <tr>
             <th style="width: 5%">#</th>
-            <th style="width: 75%">${tr(_("Name"))}</th>
-            <th style="width: 25%">${tr(_("MIME type"))}</th>
-            <th style="width: 0%; white-space: nowrap;">${tr(_("Size, KB"))}</th>
+            <th style="width: 75%">${tr(gettext("Name"))}</th>
+            <th style="width: 25%">${tr(gettext("MIME type"))}</th>
+            <th style="width: 0%; white-space: nowrap;">${tr(gettext("Size, KB"))}</th>
         </tr>
     </thead>
     %for idx, fobj in enumerate(obj.files, start=1):
