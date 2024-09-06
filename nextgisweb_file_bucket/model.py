@@ -51,9 +51,24 @@ class FileBucketFile(Base):
         backref=db.backref("files", cascade="all,delete-orphan"),
     )
 
+    file_resource_id = db.relationship("FileResource", cascade="all,delete",
+        backref="file_bucket_file")
+
     @property
     def path(self):
         return self.fileobj.filename()
+
+class FileResource(Base):
+    __tablename__ = 'file_resource'
+    identity = 'file_resource'
+    cls_display_name = gettext("File resource")
+
+    __scope__ = DataScope
+    id = db.Column(db.Integer, primary_key=True)
+    file_resource_id = db.Column(
+        db.ForeignKey(FileBucketFile.id),
+        primary_key=True
+    )
 
 
 def validate_filename(filename):
@@ -162,7 +177,9 @@ class FileBucketSerializer(Serializer):
     resclass = FileBucket
 
     archive = _archive_attr(read=None, write=ResourceScope.update)
+
     files = _files_attr(read=DataScope.read, write=DataScope.write)
+
     tstamp = _tsamp_attr(read=ResourceScope.read, write=ResourceScope.update)
 
     def deserialize(self):
