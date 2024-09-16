@@ -2,18 +2,27 @@ import os
 import os.path
 import zipfile
 from datetime import datetime
+from typing import Dict, List, Union
 
-import dateutil
 import magic
+import sqlalchemy as sa
+import sqlalchemy.orm as orm
+from msgspec import UNSET, Struct, UnsetType
 
 from nextgisweb.env import Base, DBSession, gettext
-from nextgisweb.lib import db
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
-from nextgisweb.file_upload import FileUpload
-from nextgisweb.resource import DataScope, Resource, ResourceGroup, ResourceScope, Serializer
-from nextgisweb.resource import SerializedProperty as SP
+from nextgisweb.file_upload import FileUpload, FileUploadID, FileUploadRef
+from nextgisweb.resource import (
+    DataScope,
+    Resource,
+    ResourceGroup,
+    ResourceScope,
+    SAttribute,
+    SColumn,
+    Serializer,
+)
 from nextgisweb.resource.category import MiscellaneousCategory
 
 
@@ -24,34 +33,33 @@ class FileBucket(Base, Resource):
 
     __scope__ = DataScope
 
-    tstamp = db.Column(db.DateTime())
+    tstamp = sa.Column(sa.DateTime())
 
     @classmethod
-    def check_parent(self, parent):
+    def check_parent(cls, parent):
         return isinstance(parent, ResourceGroup)
 
 
 class FileBucketFile(Base):
     __tablename__ = "file_bucket_file"
 
-    id = db.Column(db.Integer, primary_key=True)
-    file_bucket_id = db.Column(db.ForeignKey(FileBucket.id), nullable=False)
-    fileobj_id = db.Column(db.ForeignKey(FileObj.id), nullable=False)
-    name = db.Column(db.Unicode(255), nullable=False)
-    mime_type = db.Column(db.Unicode, nullable=False)
-    size = db.Column(db.BigInteger, nullable=False)
+    id = sa.Column(sa.Integer, primary_key=True)
+    file_bucket_id = sa.Column(sa.ForeignKey(FileBucket.id), nullable=False)
+    fileobj_id = sa.Column(sa.ForeignKey(FileObj.id), nullable=False)
+    name = sa.Column(sa.Unicode(255), nullable=False)
+    mime_type = sa.Column(sa.Unicode, nullable=False)
+    size = sa.Column(sa.BigInteger, nullable=False)
 
-    __table_args__ = (db.UniqueConstraint(file_bucket_id, name),)
+    __table_args__ = (sa.UniqueConstraint(file_bucket_id, name),)
 
-    fileobj = db.relationship(FileObj, lazy="joined")
-
-    file_bucket = db.relationship(
+    fileobj = orm.relationship(FileObj, lazy="joined")
+    file_bucket = orm.relationship(
         FileBucket,
         foreign_keys=file_bucket_id,
-        backref=db.backref("files", cascade="all,delete-orphan"),
+        backref=orm.backref("files", cascade="all,delete-orphan"),
     )
 
-    file_resource_id = db.relationship("FileResource", cascade="all,delete",
+    file_resource_id = orm.relationship("FileResource", cascade="all,delete",
         backref="file_bucket_file")
 
     @property
@@ -64,9 +72,9 @@ class FileResource(Base):
     cls_display_name = gettext("File resource")
 
     __scope__ = DataScope
-    id = db.Column(db.Integer, primary_key=True)
-    file_resource_id = db.Column(
-        db.ForeignKey(FileBucketFile.id),
+    id = sa.Column(sa.Integer, primary_key=True)
+    file_resource_id = sa.Column(
+        sa.ForeignKey(FileBucketFile.id),
         primary_key=True
     )
 
@@ -76,21 +84,14 @@ def validate_filename(filename):
     return not os.path.isabs(filename) and filename == os.path.normpath(filename)
 
 
-class _archive_attr(SP):
-    def setter(self, srlzr, value):
-        srlzr.obj.tstamp = datetime.utcnow()
-
-        fupload = FileUpload(id=value["id"])
-
-        old_files = list(srlzr.obj.files)
-
-        with DBSession.no_autoflush:
-            for f in old_files:
-                srlzr.obj.files.remove(f)
-
+class ArchiveAttr(SAttribute, apitype=True):
+    def set(self, srlzr: Serializer, value: FileUploadRef, *, create: bool):
+        obj = srlzr.obj
+        obj.tstamp = datetime.utcnow()
+        obj.files[:] = []
         DBSession.flush()
 
-        with zipfile.ZipFile(fupload.data_path, mode="r", allowZip64=True) as archive:
+        with zipfile.ZipFile(value().data_path, mode="r", allowZip64=True) as archive:
             for file_info in archive.infolist():
                 if file_info.is_dir():
                     continue
@@ -113,19 +114,33 @@ class _archive_attr(SP):
                 srlzr.obj.files.append(filebucketfileobj)
 
 
-class _files_attr(SP):
-    def getter(self, srlzr):
-        return [dict(name=f.name, size=f.size, mime_type=f.mime_type) for f in srlzr.obj.files]
+class FileUploadFileRead(Struct, kw_only=True):
+    name: str
+    size: int
+    mime_type: str
 
-    def setter(self, srlzr, value):
-        srlzr.obj.tstamp = datetime.utcnow()
 
-        files_info = dict()
+class FileUploadFileWrite(Struct, kw_only=True):
+    name: str
+    id: Union[FileUploadID, UnsetType] = UNSET
+
+
+class FilesAttr(SAttribute, apitype=True):
+    def get(self, srlzr: Serializer) -> List[FileUploadFileRead]:
+        return [
+            FileUploadFileRead(name=f.name, size=f.size, mime_type=f.mime_type)
+            for f in srlzr.obj.files
+        ]
+
+    def set(self, srlzr: Serializer, value: List[FileUploadFileWrite], *, create: bool):
+        obj = srlzr.obj
+        obj.tstamp = datetime.utcnow()
+
+        files_info: Dict[str, FileUploadFileWrite] = dict()
         for f in value:
-            name = f.pop("name")
-            if not validate_filename(name):
+            if not validate_filename(f.name):
                 raise ValidationError(message="Insecure filename.")
-            files_info[name] = f
+            files_info[f.name] = f
 
         removed_files = list()
         for filebucket_file in srlzr.obj.files:
@@ -133,8 +148,8 @@ class _files_attr(SP):
                 removed_files.append(filebucket_file)
             else:
                 file_info = files_info.pop(filebucket_file.name)
-                if "id" in file_info:  # Updated file
-                    fupload = FileUpload(id=file_info["id"])
+                if file_info.id is not UNSET:
+                    fupload = FileUpload(id=file_info.id)
                     filebucket_file.fileobj = fupload.to_fileobj()
                 else:  # Untouched file
                     pass
@@ -143,48 +158,23 @@ class _files_attr(SP):
             srlzr.obj.files.remove(f)
 
         for name, file_info in files_info.items():  # New file
-            fupload = FileUpload(id=file_info["id"])
-            fileobj = fupload.to_fileobj()
-
+            fupload = FileUpload(id=file_info.id)
             filebucket_file = FileBucketFile(
                 name=name,
-                size=file_info["size"],
-                mime_type=file_info["mime_type"],
-                fileobj=fileobj,
+                size=fupload.size,
+                mime_type=fupload.mime_type,
+                fileobj=fupload.to_fileobj(),
             )
 
             srlzr.obj.files.append(filebucket_file)
 
 
-class _tsamp_attr(SP):
-    def getter(self, srlzr):
-        if srlzr.obj.tstamp is not None:
-            return srlzr.obj.tstamp.isoformat()
-        else:
-            return None
-
-    def setter(self, srlzr, value):
-        if isinstance(value, str):
-            srlzr.obj.tstamp = dateutil.parser.parse(value)
-        elif value is None:
-            srlzr.obj.tstamp = None
-        else:
-            raise ValidationError(message="Invalid timestamp value.")
-
-
-class FileBucketSerializer(Serializer):
-    identity = FileBucket.identity
-    resclass = FileBucket
-
-    archive = _archive_attr(read=None, write=ResourceScope.update)
-
-    files = _files_attr(read=DataScope.read, write=DataScope.write)
-
-    tstamp = _tsamp_attr(read=ResourceScope.read, write=ResourceScope.update)
+class FileBucketSerializer(Serializer, resource=FileBucket):
+    archive = ArchiveAttr(read=None, write=ResourceScope.update)
+    files = FilesAttr(read=DataScope.read, write=DataScope.write)
+    tstamp = SColumn(read=ResourceScope.read, write=ResourceScope.update)
 
     def deserialize(self):
-        if "files" in self.data and "archive" in self.data:
-            raise ValidationError(
-                message="'files' and 'archive' attributes should not pass together."
-            )
+        if self.data.files is not UNSET and self.data.archive is not UNSET:
+            raise ValidationError("'files' and 'archive' attributes should not pass together.")
         super().deserialize()
