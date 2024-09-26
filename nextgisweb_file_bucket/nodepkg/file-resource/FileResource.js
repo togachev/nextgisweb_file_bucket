@@ -13,7 +13,6 @@ import "./details.less";
 const animatedComponents = makeAnimated();
 
 export function FileResource(props) {
-    console.log(props);
     const [items, setItems] = useState([]);
     const [defaultItems, setDefault] = useState([]);
 

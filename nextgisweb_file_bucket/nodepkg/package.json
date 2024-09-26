@@ -3,6 +3,6 @@
     "version": "0.0.0",
     "type": "module",
     "dependencies": {
-        "react-select": "^5.7.0"
+        "react-select": "^5.8.1"
     }
 }

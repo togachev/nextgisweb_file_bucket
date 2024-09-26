@@ -64,7 +64,6 @@ export const ResourceFile = observer(({ value, id, onChange }) => {
                     event.stopPropagation();
                 }}>
                 <SvgIconLink
-                    title={gettext("Info")}
                     href={routeURL("resource.show", id)}
                     icon="material-info"
                     target="_blank"
@@ -74,7 +73,7 @@ export const ResourceFile = observer(({ value, id, onChange }) => {
         )
     };
 
-    const EditLayerFiles = gettext("Edit layer files");
+    const EditLayerFiles = gettext("Edit attached files");
     const msgVisibleResoureFile = visibleFile ? gettext("Hide attached Files") : gettext("Show attached files");
 
     return (
