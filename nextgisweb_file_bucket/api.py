@@ -36,38 +36,38 @@ def export(resource, request):
     return Response(
         app_iter=zip_stream,
         content_type="application/zip",
-        content_disposition='attachment; filename="%d.zip"' % resource.id,
+        content_disposition="attachment; filename='%d.zip'" % resource.id,
     )
-@viewargs(renderer='json')
+@viewargs(renderer="json")
 def file_resource_create(request):
     request.resource_permission(ResourceScope.update)
-    fid = int(request.matchdict['fid'])
+    fid = int(request.matchdict["fid"])
     try:
         query = FileResource(id=request.context.id, file_resource_id=fid)
         DBSession.add(query)   
         DBSession.flush()
     except SQLAlchemyError as exc:
-        raise ExternalDatabaseError(message=_("ERROR: duplicate key violates unique constraint."), sa_error=exc)
+        raise ExternalDatabaseError(message=gettext("ERROR: duplicate key violates unique constraint."), sa_error=exc)
 
     return dict(id=request.context.id, file_resource_id=fid)
 
-@viewargs(renderer='json')
+@viewargs(renderer="json")
 def file_resource_delete(request):
     request.resource_permission(ResourceScope.update)
     obj = FileResource.filter_by(id=request.context.id,
-        file_resource_id=int(request.matchdict['fid'])).one()
+        file_resource_id=int(request.matchdict["fid"])).one()
     DBSession.delete(obj)
     DBSession.flush()
     return None
 
-@viewargs(renderer='json')
+@viewargs(renderer="json")
 def file_resource_delete_all(request):
     request.resource_permission(ResourceScope.update)
     DBSession.query(FileResource).filter_by(id=request.context.id).delete()
     DBSession.flush()
     return None
 
-@viewargs(renderer='json')
+@viewargs(renderer="json")
 def file_resource_group_show(resource, request):
     result = list()
     query = DBSession.query(FileResource, FileBucketFile, Resource) \
@@ -87,7 +87,7 @@ def file_resource_group_show(resource, request):
                 name=fbf.name,
                 mime_type = fbf.mime_type,
                 size = fbf.size,
-                link = request.route_url('resource.file_download', id=fbf.file_bucket_id, name=fbf.name),
+                link = request.route_url("resource.file_download", id=fbf.file_bucket_id, name=fbf.name),
                 res_name = res.display_name,
             ))
 
@@ -98,7 +98,7 @@ def file_resource_group_show(resource, request):
 
     return res
 
-@viewargs(renderer='json')
+@viewargs(renderer="json")
 def files(request):
     result = list()
     query = DBSession.query(FileBucketFile, FileBucket) \
@@ -112,15 +112,15 @@ def files(request):
                 name=fbf.name,
                 mime_type = fbf.mime_type,
                 size = fbf.size,
-                link = request.route_url('resource.file_download', id=fbf.file_bucket_id, name=fbf.name),
+                link = request.route_url("resource.file_download", id=fbf.file_bucket_id, name=fbf.name),
                 file_bucket_name = fb.display_name,
             ))
 
     return result
 
-@viewargs(renderer='json')
+@viewargs(renderer="json")
 def file_resource(resource, request):
-    if resource.cls in ['mapserver_style', 'qgis_vector_style', 'qgis_raster_style', 'wmsclient_layer', 'tmsclient_layer']:
+    if resource.cls in ["mapserver_style", "qgis_vector_style", "qgis_raster_style", "wmsclient_layer", "tmsclient_layer"]:
         if resource.has_permission(ResourceScope.update, request.user):
             fileList = list() # список всех файлов
             fileItem = list() # список файлов ресурса
@@ -163,54 +163,54 @@ def setup_pyramid(comp, config):
         export,
         route_name="resource.export",
         context=FileBucket,
-        request_method='GET',
+        request_method="GET",
     )
 
     config.add_route(
-        'file_resource.data',
-        r'/file-resource/{id:uint}/data',
+        "file_resource.data",
+        r"/file-resource/{id:uint}/data",
         factory=resource_factory,
         get=file_resource
     )
 
     config.add_route(
-        'file_bucket.export',
-        r'/api/resource/{id:uint}/file_bucket/export',
+        "file_bucket.export",
+        r"/api/resource/{id:uint}/file_bucket/export",
         factory=resource_factory,
         request_method="GET",
         get=export,
     )
 
     config.add_route(
-        'file_resource.create',
-        r'/api/file-resource/{id:uint}/create/{fid:uint}/',
+        "file_resource.create",
+        r"/api/file-resource/{id:uint}/create/{fid:uint}/",
         factory=resource_factory,
         get=file_resource_create
     )
 
     config.add_route(
-        'file_resource.delete',
-        r'/api/file-resource/{id:uint}/delete/{fid:uint}/',
+        "file_resource.delete",
+        r"/api/file-resource/{id:uint}/delete/{fid:uint}/",
         factory=resource_factory,
         get=file_resource_delete
     )
 
     config.add_route(
-        'file_resource.delete_all',
-        r'/api/file-resource/{id:uint}/delete_all',
+        "file_resource.delete_all",
+        r"/api/file-resource/{id:uint}/delete_all",
         factory=resource_factory,
         get=file_resource_delete_all
     )
 
     config.add_route(
-        'file_resource.group_show',
-        '/api/file-resource/{id:uint}/group_show',
+        "file_resource.group_show",
+        "/api/file-resource/{id:uint}/group_show",
         factory=resource_factory,
         get=file_resource_group_show
     )
 
     config.add_route(
-        'file_resource.all',
-        '/api/file-resource/all',
+        "file_resource.all",
+        "/api/file-resource/all",
         get=files
     )
