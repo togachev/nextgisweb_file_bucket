@@ -6,6 +6,7 @@ import { Collapse, ConfigProvider, Select, Table } from "@nextgisweb/gui/antd";
 import { observer } from "mobx-react-lite";
 import type { CollapseProps, TableProps } from "@nextgisweb/gui/antd";
 import { CaretRightOutlined } from '@ant-design/icons';
+import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import "./PublicFiles.less";
 import { PublicFilesStore } from "./PublicFilesStore";
 
@@ -80,12 +81,30 @@ export const PublicFiles = observer((props) => {
     };
 
     const itemsGroup = groupBy(finalArray, "res_name");
+    
+    const genExtra = (id) => {
+        return (
+            <span
+                className="icon-file-resource"
+                onClick={(event) => {
+                    event.stopPropagation();
+                }}>
+                <SvgIconLink
+                    href={routeURL("resource.show", id)}
+                    icon="material-info"
+                    target="_blank"
+                    fill="currentColor"
+                />
+            </span>
+        )
+    };
 
     const itemsCollapse = useMemo(() => {
         const items: CollapseProps["items"] = [];
         let defaultActiveKey: string[] = [];
 
         Object.keys(itemsGroup).map((key, value) => {
+            const file_bucket_id = itemsGroup[key][0].file_bucket_id;
             defaultActiveKey.push(value.toString())
             items.push({
                 key: value,
@@ -99,6 +118,7 @@ export const PublicFiles = observer((props) => {
                         size="small"
                     />
                 ),
+                extra: genExtra(file_bucket_id)
             })
         })
 
@@ -110,7 +130,7 @@ export const PublicFiles = observer((props) => {
                 ghost
                 defaultActiveKey={defaultActiveKey}
                 expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
-                expandIconPosition="end"
+                className="collapse-content"
             />
         );
     }, [defaultItems]);
@@ -139,7 +159,7 @@ export const PublicFiles = observer((props) => {
     }
 
     const filterSort = (optionA, optionB) => (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-    
+
     return (
         <div className="public-files-component">
             <ConfigProvider
@@ -148,7 +168,7 @@ export const PublicFiles = observer((props) => {
                     },
                     components: {
                         Collapse: {
-                            headerPadding: "10px 9px",
+                            headerPadding: "2px 8px",
                             contentPadding: "0px 0px",
                             paddingSM: "6px"
                         },
