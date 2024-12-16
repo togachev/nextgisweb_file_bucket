@@ -1,4 +1,4 @@
-import { React, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { route, routeURL } from "@nextgisweb/pyramid/api";
 import { gettext } from "@nextgisweb/pyramid/i18n";
 import { errorModal } from "@nextgisweb/gui/error";
@@ -101,7 +101,7 @@ export const PublicFiles = observer((props) => {
 
     const itemsCollapse = useMemo(() => {
         const items: CollapseProps["items"] = [];
-        let defaultActiveKey: string[] = [];
+        const defaultActiveKey: string[] = [];
 
         Object.keys(itemsGroup).map((key, value) => {
             const file_bucket_id = itemsGroup[key][0].file_bucket_id;
