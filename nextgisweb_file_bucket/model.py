@@ -84,7 +84,7 @@ def validate_filename(filename):
     return not os.path.isabs(filename) and filename == os.path.normpath(filename)
 
 
-class ArchiveAttr(SAttribute, apitype=True):
+class ArchiveAttr(SAttribute):
     def set(self, srlzr: Serializer, value: FileUploadRef, *, create: bool):
         obj = srlzr.obj
         obj.tstamp = datetime.utcnow()
@@ -125,7 +125,7 @@ class FileUploadFileWrite(Struct, kw_only=True):
     id: Union[FileUploadID, UnsetType] = UNSET
 
 
-class FilesAttr(SAttribute, apitype=True):
+class FilesAttr(SAttribute):
     def get(self, srlzr: Serializer) -> List[FileUploadFileRead]:
         return [
             FileUploadFileRead(name=f.name, size=f.size, mime_type=f.mime_type)
