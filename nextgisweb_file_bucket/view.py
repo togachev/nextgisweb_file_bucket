@@ -1,16 +1,17 @@
 from nextgisweb.env import gettext
 from nextgisweb.lib.dynmenu import DynItem, Label, Link
 
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import Resource, Widget
 from nextgisweb.resource.view import resource_sections
 
 from .model import FileBucket
 
 
-class Widget(Widget):
+class FileBucketWidget(Widget):
     resource = FileBucket
     operation = ("create", "update")
-    amdmod = "@nextgisweb/file-bucket/resource-widget"
+    amdmod = jsentry("@nextgisweb/file-bucket/resource-widget")
 
 
 class FileBucketMenu(DynItem):
