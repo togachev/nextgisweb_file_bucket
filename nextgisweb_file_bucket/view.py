@@ -2,19 +2,18 @@ from nextgisweb.env import gettext, DBSession
 from nextgisweb.lib.dynmenu import DynItem, Label, Link
 
 from nextgisweb.pyramid import viewargs
-
+from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import Resource, Widget, resource_factory, ResourceScope
 from nextgisweb.resource.view import resource_sections
-from nextgisweb.core.exception import ForbiddenError, InsufficientPermissions
 
 from .model import FileBucket, FileResource, FileBucketFile
 
 
 
-class Widget(Widget):
+class FileBucketWidget(Widget):
     resource = FileBucket
     operation = ("create", "update")
-    amdmod = "@nextgisweb/file-bucket/resource-widget"
+    amdmod = jsentry("@nextgisweb/file-bucket/resource-widget")
 
 
 class FileBucketMenu(DynItem):
