@@ -27,9 +27,10 @@ class FileBucketMenu(DynItem):
                 )
 
 
+@resource_sections("@nextgisweb/file-bucket/resource-section")
+def resource_section(obj, **kwargs):
+    return isinstance(obj, FileBucket)
+
+
 def setup_pyramid(comp, config):
     Resource.__dynmenu__.add(FileBucketMenu())
-
-    @resource_sections(title=gettext("File bucket"), priority=20)
-    def resource_section(obj):
-        return isinstance(obj, FileBucket)
