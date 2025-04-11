@@ -5,30 +5,35 @@ import { FileUploaderButton } from "@nextgisweb/file-upload/file-uploader";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
 import { Button, Space, message } from "@nextgisweb/gui/antd";
 import { EdiTable } from "@nextgisweb/gui/edi-table";
+import type { EdiTableColumn } from "@nextgisweb/gui/edi-table/type";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import type { EditorWidget } from "@nextgisweb/resource/type";
+
+import type { ResourceFile, Store } from "./Store";
 
 import ClearIcon from "@nextgisweb/icon/mdi/close";
 import ArchiveIcon from "@nextgisweb/icon/mdi/zip-box";
 
 import "./Widget.less";
 
-function showError([status, msg]) {
+function showError([status, msg]: [boolean, string | undefined | null]) {
     if (!status) message.error(msg);
 }
 
-const columns = [
+const columns: EdiTableColumn<ResourceFile>[] = [
     {
         key: "name",
-        component: ({ value }) => value,
+        component: ({ value }) => <>{value}</>,
     },
     {
         key: "size",
-        component: ({ value }) => (value ? formatSize(value) : <></>),
+        component: ({ value }) =>
+            typeof value === "number" ? formatSize(value) : <></>,
     },
 ];
 
-export const Widget = observer(({ store }) => {
+export const ResourceWidget: EditorWidget<Store> = observer(({ store }) => {
     const actions = useMemo(
         () => [
             <FileUploaderButton
@@ -50,7 +55,7 @@ export const Widget = observer(({ store }) => {
                 uploadText={gettext("Import from ZIP archive")}
             />,
         ],
-        []
+        [store]
     );
 
     return (
@@ -73,7 +78,8 @@ export const Widget = observer(({ store }) => {
                 <>
                     <ActionToolbar pad borderBlockEnd actions={actions} />
                     <EdiTable
-                        {...{ store, columns }}
+                        store={store}
+                        columns={columns}
                         rowKey="id"
                         showHeader={false}
                         parentHeight
@@ -84,6 +90,6 @@ export const Widget = observer(({ store }) => {
     );
 });
 
-Widget.displayName = "Widget";
-Widget.title = gettext("File bucket");
-Widget.activateOn = { update: true };
+ResourceWidget.displayName = "ResourceWidget";
+ResourceWidget.title = gettext("File bucket");
+ResourceWidget.activateOn = { update: true };

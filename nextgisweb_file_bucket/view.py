@@ -63,6 +63,11 @@ def file_resource(resource, request):
     else:
         raise ForbiddenError()
 
+@resource_sections("@nextgisweb/file-bucket/resource-section")
+def resource_section(obj, **kwargs):
+    return isinstance(obj, FileBucket)
+
+
 def setup_pyramid(comp, config):
     config.add_route(
         "file_resource.settings",
@@ -71,7 +76,3 @@ def setup_pyramid(comp, config):
     ).add_view(file_resource)
 
     Resource.__dynmenu__.add(FileBucketMenu())
-
-    @resource_sections(title=gettext("File bucket"), priority=20)
-    def resource_section(obj):
-        return isinstance(obj, FileBucket)
