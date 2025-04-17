@@ -1,12 +1,10 @@
-import { makeAutoObservable } from "mobx";
-
-export type SetValue<T> = ((prevValue: T) => T) | T;
+import { action, observable } from "mobx";
 
 export class ResourceFileStore {
-    defaultItems: string[] = [];
-    defaultArray: number[] = [];
-    isOpen = true;
-    visibleFile: boolean;
+    @observable.shallow accessor defaultItems: string[] = [];
+    @observable.shallow accessor defaultArray: number[] = [];
+    @observable.ref accessor isOpen: boolean = true;
+    @observable.ref accessor visibleFile: boolean = false;
 
     constructor({ visibleFile, ...props }) {
         this.visibleFile = visibleFile;
@@ -17,37 +15,25 @@ export class ResourceFileStore {
                 Object.assign(this, { [k]: prop });
             }
         }
-
-        makeAutoObservable(this, {});
     }
 
-    setDefaultItems = (defaultItems: SetValue<string[]>) => {
-        this.setValue("defaultItems", defaultItems);
+    @action
+    setDefaultItems(defaultItems: string[]) {
+        this.defaultItems = defaultItems;
     };
 
-    setDefaultArray = (defaultArray: number[]) => {
+    @action
+    setDefaultArray(defaultArray: number[]) {
         this.defaultArray = defaultArray;
     };
 
-    setIsOpen = (isOpen: boolean) => {
+    @action
+    setIsOpen(isOpen: boolean) {
         this.isOpen = isOpen;
     };
 
-    setVisibleFile = (visibleFile: boolean) => {
+    @action
+    setVisibleFile(visibleFile: boolean) {
         this.visibleFile = visibleFile;
     };
-
-    private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
-        const isUpdaterFunction = (
-            input: unknown
-        ): input is (prevValue: T) => T => {
-            return typeof input === "function";
-        };
-
-        const newValue = isUpdaterFunction(valueOrUpdater)
-            ? valueOrUpdater(this[property] as T)
-            : valueOrUpdater;
-
-        Object.assign(this, { [property]: newValue });
-    }
 }

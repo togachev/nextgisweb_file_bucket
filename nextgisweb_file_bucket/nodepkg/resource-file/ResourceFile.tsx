@@ -6,6 +6,7 @@ import { gettext } from "@nextgisweb/pyramid/i18n";
 import { observer } from "mobx-react-lite";
 import { SvgIconLink } from "@nextgisweb/gui/svg-icon";
 import { ResourceFileStore } from "./ResourceFileStore";
+
 import "./ResourceFile.less";
 import { useSource } from "./hook/useSource";
 
@@ -15,13 +16,11 @@ export const ResourceFile = observer(({ value, id, onChange }) => {
         visibleFile: value
     }));
 
-    const { visibleFile, setVisibleFile, setDefaultItems, isOpen, defaultItems } = store;
-
     useEffect(() => {
-        setVisibleFile(value);
+        store.setVisibleFile(value);
         listResourceFile(id)
             .then(items => {
-                setDefaultItems(items);
+                store.setDefaultItems(items);
             })
     }, [id])
 
@@ -49,11 +48,7 @@ export const ResourceFile = observer(({ value, id, onChange }) => {
 
     const onValueChecked: CheckboxProps["onChange"] = (e) => {
         onChange(e.target.checked);
-        setVisibleFile(e.target.checked);
-    };
-
-    const onChangeCollapse = (key: string | string[]) => {
-        console.log(key);
+        store.setVisibleFile(e.target.checked);
     };
 
     const genExtra = (id) => {
@@ -74,7 +69,7 @@ export const ResourceFile = observer(({ value, id, onChange }) => {
     };
 
     const EditLayerFiles = gettext("Edit attached files");
-    const msgVisibleResoureFile = visibleFile ? gettext("Hide attached Files") : gettext("Show attached files");
+    const msgVisibleResoureFile = store.visibleFile ? gettext("Hide attached Files") : gettext("Show attached files");
 
     return (
         <div className="resource-file-component">
@@ -91,8 +86,8 @@ export const ResourceFile = observer(({ value, id, onChange }) => {
                 }}
             >
                 <div className="file-visible">
-                    <Checkbox checked={visibleFile} onChange={onValueChecked}>{msgVisibleResoureFile}</Checkbox>
-                    {visibleFile && (<span className="icon-file-resource">
+                    <Checkbox checked={store.visibleFile} onChange={onValueChecked}>{msgVisibleResoureFile}</Checkbox>
+                    {store.visibleFile && (<span className="icon-file-resource">
                         <SvgIconLink
                             href={routeURL("file_resource.settings", id)}
                             icon="material-edit"
@@ -103,7 +98,7 @@ export const ResourceFile = observer(({ value, id, onChange }) => {
                         </SvgIconLink>
                     </span>)}
                 </div>
-                {visibleFile && Object.entries(defaultItems).map((item, index) => {
+                {store.visibleFile && Object.entries(store.defaultItems).map((item, index) => {
                     const label = item[0];
                     const data = item[1];
                     const id = data[0].file_bucket_id;
@@ -129,8 +124,7 @@ export const ResourceFile = observer(({ value, id, onChange }) => {
                             className="collapse-content"
                             size="small"
                             bordered={false}
-                            defaultActiveKey={isOpen ? defaultActiveKey : undefined}
-                            onChange={onChangeCollapse}
+                            defaultActiveKey={store.isOpen ? defaultActiveKey : undefined}
                             items={itemsFileList}
                         />
                     )

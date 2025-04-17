@@ -41,13 +41,8 @@ export const PublicFiles = observer((props) => {
     const [store] = useState(() => new PublicFilesStore({
         defaultItems: props.fileList.filter((item) => props.fileItem.some((id2) => id2 === item.id))
     }));
-
+    
     const items = props.fileList;
-
-    const {
-        defaultItems,
-        setDefaultItems,
-    } = store;
 
     const fileColumns: TableProps["items"] = [
         {
@@ -71,7 +66,7 @@ export const PublicFiles = observer((props) => {
         },
     ];
 
-    const finalArray = defaultItems.map(obj => Object.assign(obj, { key: obj.id }))
+    const finalArray = store.defaultItems.map(obj => Object.assign(obj, { key: obj.id }))
 
     const groupBy = (items, key) => {
         return items.reduce((result, item) => {
@@ -124,7 +119,7 @@ export const PublicFiles = observer((props) => {
 
         return (
             <Collapse
-                key={defaultItems.length}
+                key={store.defaultItems.length}
                 items={items.sort((a, b) => (a.label || "").localeCompare(b.label || ""))}
                 bordered={false}
                 ghost
@@ -133,15 +128,15 @@ export const PublicFiles = observer((props) => {
                 className="collapse-content"
             />
         );
-    }, [defaultItems]);
+    }, [store.defaultItems]);
 
     const onChange = (e) => {
-        setDefaultItems(items.filter((item) => e.some((s) => s.value === item.id)));
+        store.setDefaultItems(items.filter((item) => e.some((s) => s.value === item.id)));
     };
 
     const onDeselect = (e) => {
         deleteItem(props.id, e.value);
-        setDefaultItems(defaultItems.filter((item) => item.id !== e.value));
+        store.setDefaultItems(store.defaultItems.filter((item) => item.id !== e.value));
     }
 
     const onSelect = (e) => {
@@ -176,7 +171,7 @@ export const PublicFiles = observer((props) => {
                 }}
             >
                 <Select
-                    defaultValue={defaultItems}
+                    defaultValue={store.defaultItems}
                     style={{ width: "100%" }}
                     onChange={onChange}
                     onDeselect={onDeselect}

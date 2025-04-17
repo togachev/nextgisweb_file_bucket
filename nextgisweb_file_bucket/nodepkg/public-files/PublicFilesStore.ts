@@ -1,6 +1,4 @@
-import { makeAutoObservable } from "mobx";
-
-export type SetValue<T> = ((prevValue: T) => T) | T;
+import { action, observable } from "mobx";
 
 export interface FileProps {
     id: number;
@@ -13,7 +11,7 @@ export interface FileProps {
 }
 
 export class PublicFilesStore {
-    defaultItems: FileProps[] = [];
+    @observable.shallow accessor defaultItems: FileProps[] = [];
 
     constructor({ ...props }) {
         for (const key in props) {
@@ -23,25 +21,10 @@ export class PublicFilesStore {
                 Object.assign(this, { [k]: prop });
             }
         }
-
-        makeAutoObservable(this, {});
     }
 
-    setDefaultItems = (defaultItems: FileProps[]) => {
+    @action
+    setDefaultItems(defaultItems: FileProps[]) {
         this.defaultItems = defaultItems;
     };
-
-    private setValue<T>(property: keyof this, valueOrUpdater: SetValue<T>) {
-        const isUpdaterFunction = (
-            input: unknown
-        ): input is (prevValue: T) => T => {
-            return typeof input === "function";
-        };
-
-        const newValue = isUpdaterFunction(valueOrUpdater)
-            ? valueOrUpdater(this[property] as T)
-            : valueOrUpdater;
-
-        Object.assign(this, { [property]: newValue });
-    }
 }
