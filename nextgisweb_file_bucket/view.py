@@ -1,5 +1,5 @@
 from nextgisweb.env import gettext, DBSession
-from nextgisweb.lib.dynmenu import DynItem, Label, Link
+from nextgisweb.lib.dynmenu import Label, Link
 
 from nextgisweb.pyramid import viewargs
 from nextgisweb.jsrealm import jsentry
@@ -14,19 +14,6 @@ class FileBucketWidget(Widget):
     resource = FileBucket
     operation = ("create", "update")
     amdmod = jsentry("@nextgisweb/file-bucket/resource-widget")
-
-
-class FileBucketMenu(DynItem):
-    def build(self, args):
-        yield Label("file_bucket", gettext("File bucket"))
-
-        if isinstance(args.obj, FileBucket):
-            if args.obj.has_export_permission(args.request.user):
-                yield Link(
-                    "file_bucket/export",
-                    gettext("Export"),
-                    lambda args: args.request.route_url("resource.export", id=args.obj.id),
-                )
 
 @viewargs(renderer="react")
 def file_resource(resource, request):
@@ -69,10 +56,22 @@ def resource_section(obj, **kwargs):
 
 
 def setup_pyramid(comp, config):
+
+
     config.add_route(
         "file_resource.settings",
         r"/file-resource/{id:uint}/settings",
         factory=resource_factory,
     ).add_view(file_resource)
 
-    Resource.__dynmenu__.add(FileBucketMenu())
+    @Resource.__dynmenu__.add
+    def _resource_dynmenu(args):
+        yield Label("file_bucket", gettext("File bucket"))
+
+        if isinstance(args.obj, FileBucket):
+            if args.obj.has_export_permission(args.request.user):
+                yield Link(
+                    "file_bucket/export",
+                    label=gettext("Export"),
+                    url=lambda args: args.request.route_url("resource.export", id=args.obj.id),
+                )
