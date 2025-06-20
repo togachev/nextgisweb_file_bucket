@@ -1,35 +1,35 @@
-#: model.py:28 nodepkg/resource-widget/Widget.js:87 view.py:19 view.py:32
+#: model.py:31 nodepkg/resource-widget/Widget.tsx:94 view.py:25
 msgid "File bucket"
 msgstr "Набор файлов"
 
-#: nodepkg/resource-widget/Store.js:75
-msgid "ZIP archive required"
-msgstr "Требуется ZIP-архив"
-
-#: nodepkg/resource-widget/Widget.js:41
-msgid "Add files"
-msgstr "Добавить файлы"
-
-#: nodepkg/resource-widget/Widget.js:50
-msgid "Import from ZIP archive"
-msgstr "Импортировать из ZIP-архива"
-
-#: nodepkg/resource-widget/Widget.js:61
-msgid "Files will be imported from:"
-msgstr "Файлы будут импортированы из:"
-
-#: template/resource_section.mako:5
+#: nodepkg/resource-section/FileBucketResourceSection.tsx:23
 msgid "Name"
 msgstr "Наименование"
 
-#: template/resource_section.mako:6
+#: nodepkg/resource-section/FileBucketResourceSection.tsx:39
 msgid "MIME type"
 msgstr "Тип MIME"
 
-#: template/resource_section.mako:7
-msgid "Size, KB"
-msgstr "Размер, КБ"
+#: nodepkg/resource-section/FileBucketResourceSection.tsx:44
+msgid "Size"
+msgstr "Размер"
 
-#: view.py:24
+#: nodepkg/resource-widget/Store.ts:95
+msgid "ZIP archive required"
+msgstr "Требуется ZIP-архив"
+
+#: nodepkg/resource-widget/Widget.tsx:46
+msgid "Add files"
+msgstr "Добавить файлы"
+
+#: nodepkg/resource-widget/Widget.tsx:55
+msgid "Import from ZIP archive"
+msgstr "Импортировать из ZIP-архива"
+
+#: nodepkg/resource-widget/Widget.tsx:66
+msgid "Files will be imported from:"
+msgstr "Файлы будут импортированы из:"
+
+#: view.py:31
 msgid "Export"
 msgstr "Экспорт"
