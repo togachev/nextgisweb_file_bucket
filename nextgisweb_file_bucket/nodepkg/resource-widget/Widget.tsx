@@ -3,11 +3,12 @@ import { useMemo } from "react";
 
 import { FileUploaderButton } from "@nextgisweb/file-upload/file-uploader";
 import { ActionToolbar } from "@nextgisweb/gui/action-toolbar";
-import { Button, Space, message } from "@nextgisweb/gui/antd";
+import { Button, Space } from "@nextgisweb/gui/antd";
 import { EdiTable } from "@nextgisweb/gui/edi-table";
 import type { EdiTableColumn } from "@nextgisweb/gui/edi-table/type";
 import { formatSize } from "@nextgisweb/gui/util/formatSize";
 import { gettext } from "@nextgisweb/pyramid/i18n";
+import { layoutStore } from "@nextgisweb/pyramid/layout";
 import type { EditorWidget } from "@nextgisweb/resource/type";
 
 import type { ResourceFile, Store } from "./Store";
@@ -18,7 +19,9 @@ import ArchiveIcon from "@nextgisweb/icon/mdi/zip-box";
 import "./Widget.less";
 
 function showError([status, msg]: [boolean, string | undefined | null]) {
-    if (!status) message.error(msg);
+    if (!status) {
+        layoutStore.message?.error(msg);
+    }
 }
 
 const columns: EdiTableColumn<ResourceFile>[] = [
