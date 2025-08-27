@@ -1,3 +1,4 @@
+import type { MessageInstance } from "antd/es/message/interface";
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
 
@@ -17,8 +18,13 @@ import ArchiveIcon from "@nextgisweb/icon/mdi/zip-box";
 
 import "./Widget.less";
 
-function showError([status, msg]: [boolean, string | undefined | null]) {
-    if (!status) message.error(msg);
+function showError(
+    [status, msg]: [boolean, string | undefined | null],
+    messageApi: MessageInstance
+) {
+    if (!status) {
+        messageApi.error(msg);
+    }
 }
 
 const columns: EdiTableColumn<ResourceFile>[] = [
@@ -34,6 +40,8 @@ const columns: EdiTableColumn<ResourceFile>[] = [
 ];
 
 export const ResourceWidget: EditorWidget<Store> = observer(({ store }) => {
+    const [messageApi, contextHolder] = message.useMessage();
+
     const actions = useMemo(
         () => [
             <FileUploaderButton
@@ -41,7 +49,7 @@ export const ResourceWidget: EditorWidget<Store> = observer(({ store }) => {
                 multiple={true}
                 onChange={(value) => {
                     if (!value) return;
-                    showError(store.appendFiles(value));
+                    showError(store.appendFiles(value), messageApi);
                 }}
                 uploadText={gettext("Add files")}
             />,
@@ -50,16 +58,17 @@ export const ResourceWidget: EditorWidget<Store> = observer(({ store }) => {
                 accept=".zip"
                 onChange={(value) => {
                     if (!value) return;
-                    showError(store.fromArchive(value));
+                    showError(store.fromArchive(value), messageApi);
                 }}
                 uploadText={gettext("Import from ZIP archive")}
             />,
         ],
-        [store]
+        [messageApi, store]
     );
 
     return (
         <div className="ngw-file-bucket-resource-widget">
+            {contextHolder}
             {store.archive ? (
                 <div className="archive">
                     <Space>
