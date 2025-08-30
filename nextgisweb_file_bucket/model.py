@@ -1,7 +1,6 @@
 import os
 import os.path
 import zipfile
-from datetime import datetime
 from typing import Dict, List, Union
 
 import magic
@@ -10,6 +9,7 @@ import sqlalchemy.orm as orm
 from msgspec import UNSET, Struct, UnsetType
 
 from nextgisweb.env import Base, DBSession, gettext
+from nextgisweb.lib.datetime import utcnow_naive
 
 from nextgisweb.core.exception import ValidationError
 from nextgisweb.file_storage import FileObj
@@ -87,7 +87,7 @@ def validate_filename(filename):
 class ArchiveAttr(SAttribute):
     def set(self, srlzr: Serializer, value: FileUploadRef, *, create: bool):
         obj = srlzr.obj
-        obj.tstamp = datetime.utcnow()
+        obj.tstamp = utcnow_naive()
         obj.files[:] = []
         DBSession.flush()
 
@@ -134,7 +134,7 @@ class FilesAttr(SAttribute):
 
     def set(self, srlzr: Serializer, value: List[FileUploadFileWrite], *, create: bool):
         obj = srlzr.obj
-        obj.tstamp = datetime.utcnow()
+        obj.tstamp = utcnow_naive()
 
         files_info: Dict[str, FileUploadFileWrite] = dict()
         for f in value:
