@@ -1,14 +1,43 @@
-#: model.py:31 nodepkg/resource-widget/Widget.tsx:94 view.py:25
+#: api.py:50
+msgid "ERROR: duplicate key violates unique constraint."
+msgstr "ОШИБКА: дубликат ключа нарушает ограничение уникальности."
+
+#: model.py:31 nodepkg/resource-widget/Widget.tsx:103 view.py:69
 msgid "File bucket"
 msgstr "Набор файлов"
 
+#: model.py:72
+msgid "File resource"
+msgstr ""
+
+#: nodepkg/public-files/PublicFiles.tsx:49
+#: nodepkg/resource-file/ResourceFile.tsx:29
 #: nodepkg/resource-section/FileBucketResourceSection.tsx:23
 msgid "Name"
 msgstr "Наименование"
 
+#: nodepkg/public-files/PublicFiles.tsx:55
+#: nodepkg/resource-file/ResourceFile.tsx:35
 #: nodepkg/resource-section/FileBucketResourceSection.tsx:39
 msgid "MIME type"
 msgstr "Тип MIME"
+
+#: nodepkg/public-files/PublicFiles.tsx:60
+#: nodepkg/resource-file/ResourceFile.tsx:40
+msgid "Size, KB"
+msgstr "Размер, КБ"
+
+#: nodepkg/resource-file/ResourceFile.tsx:71
+msgid "Edit attached files"
+msgstr "Редактировать прикрепленные файлы"
+
+#: nodepkg/resource-file/ResourceFile.tsx:72
+msgid "Hide attached Files"
+msgstr "Скрыть прикрепленные файлы"
+
+#: nodepkg/resource-file/ResourceFile.tsx:72
+msgid "Show attached files"
+msgstr "Показать прикрепленные файлы"
 
 #: nodepkg/resource-section/FileBucketResourceSection.tsx:44
 msgid "Size"
@@ -18,22 +47,22 @@ msgstr "Размер"
 msgid "ZIP archive required"
 msgstr "Требуется ZIP-архив"
 
-#: nodepkg/resource-widget/Widget.tsx:46
+#: nodepkg/resource-widget/Widget.tsx:54
 msgid "Add files"
 msgstr "Добавить файлы"
 
-#: nodepkg/resource-widget/Widget.tsx:55
+#: nodepkg/resource-widget/Widget.tsx:63
 msgid "Import from ZIP archive"
 msgstr "Импортировать из ZIP-архива"
 
-#: nodepkg/resource-widget/Widget.tsx:66
+#: nodepkg/resource-widget/Widget.tsx:75
 msgid "Files will be imported from:"
 msgstr "Файлы будут импортированы из:"
 
-#: view.py:31
-msgid "Export"
-msgstr "Экспорт"
-
-#: view.py:61
+#: view.py:47
 msgid "Files"
 msgstr "Файлы"
+
+#: view.py:75
+msgid "Export"
+msgstr "Экспорт"

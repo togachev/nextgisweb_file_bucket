@@ -67,8 +67,8 @@ class FileBucketFile(Base):
         return self.fileobj.filename()
 
 class FileResource(Base):
-    __tablename__ = 'file_resource'
-    identity = 'file_resource'
+    __tablename__ = "file_resource"
+    identity = "file_resource"
     cls_display_name = gettext("File resource")
 
     __scope__ = DataScope
