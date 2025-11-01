@@ -157,7 +157,7 @@ class FilesAttr(SAttribute):
 class FileBucketSerializer(Serializer, resource=FileBucket):
     archive = ArchiveAttr(read=None, write=ResourceScope.update)
     files = FilesAttr(read=DataScope.read, write=DataScope.write)
-    tstamp = SColumn(read=ResourceScope.read, write=ResourceScope.update)
+    tstamp = SColumn(read=ResourceScope.read, write=None)
 
     def deserialize(self):
         if self.data.files is not UNSET and self.data.archive is not UNSET:
