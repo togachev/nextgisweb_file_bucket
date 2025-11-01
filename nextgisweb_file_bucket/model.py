@@ -114,7 +114,7 @@ class FilesAttr(SAttribute):
     def get(self, srlzr: Serializer) -> List[FileUploadFileRead]:
         return [
             FileUploadFileRead(name=f.name, size=f.size, mime_type=f.mime_type)
-            for f in srlzr.obj.files
+            for f in sorted(srlzr.obj.files, key=lambda f: f.name)
         ]
 
     def set(self, srlzr: Serializer, value: List[FileUploadFileWrite], *, create: bool):
