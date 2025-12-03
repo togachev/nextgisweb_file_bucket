@@ -1,10 +1,10 @@
 from nextgisweb.env import gettext, DBSession
 from nextgisweb.lib.dynmenu import Label, Link
 
-from nextgisweb.pyramid import viewargs
 from nextgisweb.jsrealm import jsentry
 from nextgisweb.resource import Resource, Widget, resource_factory, ResourceScope
 from nextgisweb.resource.view import resource_sections
+from nextgisweb.gui import react_renderer
 
 from .model import FileBucket, FileResource, FileBucketFile
 
@@ -15,10 +15,11 @@ class FileBucketWidget(Widget):
     operation = ("create", "update")
     amdmod = jsentry("@nextgisweb/file-bucket/resource-widget")
 
-@viewargs(renderer="react")
-def file_resource(resource, request):
-    if resource.cls in ["mapserver_style", "qgis_vector_style", "qgis_raster_style", "wmsclient_layer", "tmsclient_layer"]:
-        if resource.has_permission(ResourceScope.update, request.user):
+
+@react_renderer("@nextgisweb/file-bucket/public-files")
+def file_resource(request):
+    if request.context.cls in ["mapserver_style", "qgis_vector_style", "qgis_raster_style", "wmsclient_layer", "tmsclient_layer"]:
+        if request.context.has_permission(ResourceScope.update, request.user):
             fileList = list() # список всех файлов
             fileItem = list() # список файлов ресурса
 
@@ -41,14 +42,10 @@ def file_resource(resource, request):
             for fr in fres:
                 fileItem.append(fr.file_resource_id)
             return dict(
-                entrypoint="@nextgisweb/file-bucket/public-files",
                 props=dict(id=request.context.id, fileList=fileList, fileItem=fileItem),
                 obj=request.context,
                 title=gettext("Files"))
-        else:
-            raise InsufficientPermissions()
-    else:
-        raise ForbiddenError()
+
 
 @resource_sections("@nextgisweb/file-bucket/resource-section")
 def resource_section(obj, **kwargs):
@@ -56,13 +53,12 @@ def resource_section(obj, **kwargs):
 
 
 def setup_pyramid(comp, config):
-
-
     config.add_route(
         "file_resource.settings",
         r"/file-resource/{id:uint}/settings",
         factory=resource_factory,
-    ).add_view(file_resource)
+        get=file_resource,
+    )
 
     @Resource.__dynmenu__.add
     def _resource_dynmenu(args):
